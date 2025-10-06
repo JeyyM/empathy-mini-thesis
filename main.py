@@ -1,0 +1,108 @@
+from emotion_bot import EmotionBot
+import os
+
+def main():
+    print("=== Emotion Tracker ===")
+    print("Enter 'camera' for webcam mode")
+    print("Or enter a video filename to process that file")
+    print()
+    
+    user_input = input("Input (camera or filename): ").strip()
+    
+    # Create emotion bot instance
+    bot = EmotionBot()
+    
+    if user_input.lower() == "camera":
+        print("\n=== Webcam Mode ===")
+        
+        # Get webcam settings
+        try:
+            duration = int(input("Duration in seconds (default 30): ") or "30")
+        except ValueError:
+            duration = 30
+            
+        try:
+            sample_rate = float(input("Sample rate in seconds (default 0.5): ") or "0.5")
+        except ValueError:
+            sample_rate = 0.5
+        
+        print(f"\nStarting webcam for {duration} seconds...")
+        print("Press 'q' to quit early")
+        
+        # Test webcam access
+        import cv2
+        cap = cv2.VideoCapture(0)
+        if not cap.isOpened():
+            print("Error: Could not access webcam")
+            return
+        cap.release()
+        
+        # Process webcam
+        df = bot.process_webcam(duration_seconds=duration, sample_rate=sample_rate)
+        output_prefix = "webcam"
+        
+    else:
+        print(f"\n=== Video File Mode ===")
+        video_path = user_input
+        
+        # Check if file exists
+        if not os.path.exists(video_path):
+            print(f"Error: File '{video_path}' not found")
+            print("Make sure the file is in the current directory or provide full path")
+            return
+        
+        # Get video settings
+        try:
+            sample_rate = float(input("Sample rate in seconds (default 1.0): ") or "1.0")
+        except ValueError:
+            sample_rate = 1.0
+        
+        print(f"Processing video: {video_path}")
+        
+        # Process video
+        df = bot.process_video(video_path, sample_rate=sample_rate)
+        output_prefix = os.path.splitext(video_path)[0].replace(" ", "_")
+    
+    # Show results
+    if not df.empty:
+        print(f"\n=== Results ===")
+        print(f"Processed {len(df)} emotion samples")
+        
+        # Show summary statistics
+        summary = bot.get_emotion_summary()
+        print("\nEmotion Summary:")
+        print("-" * 50)
+        for emotion, stats in summary.items():
+            print(f"{emotion.capitalize():>10}: Mean={stats['mean']:.3f}, Max={stats['max']:.3f}")
+        
+        # Find most dominant emotion
+        emotions = ['angry', 'disgust', 'fear', 'happy', 'sad', 'surprise', 'neutral']
+        means = {emotion: df[emotion].mean() for emotion in emotions if emotion in df.columns}
+        dominant = max(means, key=means.get)
+        print(f"\nMost dominant emotion: {dominant.upper()} ({means[dominant]:.3f})")
+        
+        # Ask about saving results
+        save_results = input("\nSave results? (y/n): ").lower().startswith('y')
+        if save_results:
+            # Save plot
+            plot_filename = f"{output_prefix}_emotions.png"
+            bot.plot_emotions(save_path=plot_filename)
+            print(f"Plot saved to {plot_filename}")
+            
+            # Save data
+            csv_filename = f"{output_prefix}_emotion_data.csv"
+            df.to_csv(csv_filename, index=False)
+            print(f"Data saved to {csv_filename}")
+        else:
+            # Just show the plot
+            bot.plot_emotions()
+        
+    else:
+        print("\nNo emotion data was captured")
+        if user_input.lower() == "camera":
+            print("Try with better lighting or make sure your face is visible")
+        else:
+            print("No faces detected in the video file")
+
+if __name__ == "__main__":
+    main()
