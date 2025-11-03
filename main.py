@@ -81,21 +81,48 @@ def main():
         dominant = max(means, key=means.get)
         print(f"\nMost dominant emotion: {dominant.upper()} ({means[dominant]:.3f})")
         
+        # Ask about visualization options
+        print("\nVisualization options:")
+        print("1. Line plots (technical)")
+        print("2. Heatmaps (technical)")
+        print("3. Easy-to-read report (for everyone)")
+        print("4. All visualizations")
+        viz_choice = input("Choose visualization (1/2/3/4): ").strip() or "3"
+        
         # Ask about saving results
         save_results = input("\nSave results? (y/n): ").lower().startswith('y')
+        
         if save_results:
-            # Save plot
-            plot_filename = f"{output_prefix}_emotions.png"
-            bot.plot_emotions(save_path=plot_filename)
-            print(f"Plot saved to {plot_filename}")
-            
-            # Save data
+            # Save data first
             csv_filename = f"{output_prefix}_emotion_data.csv"
             df.to_csv(csv_filename, index=False)
             print(f"Data saved to {csv_filename}")
+            
+            # Generate and save visualizations
+            if viz_choice in ["1", "4"]:
+                plot_filename = f"{output_prefix}_emotions.png"
+                bot.plot_emotions(save_path=plot_filename)
+                print(f"Technical line plot saved to {plot_filename}")
+            
+            if viz_choice in ["2", "4"]:
+                heatmap_filename = f"{output_prefix}_heatmap.png"
+                bot.plot_heatmap(save_path=heatmap_filename)
+                print(f"Technical heatmap saved to {heatmap_filename}")
+            
+            if viz_choice in ["3", "4"]:
+                report_filename = f"{output_prefix}_report.png"
+                bot.generate_layperson_report(save_path=report_filename)
+                print(f"Easy-to-read report saved to {report_filename}")
         else:
-            # Just show the plot
-            bot.plot_emotions()
+            # Just show the plots
+            if viz_choice in ["1", "4"]:
+                bot.plot_emotions()
+            
+            if viz_choice in ["2", "4"]:
+                bot.plot_heatmap()
+            
+            if viz_choice in ["3", "4"]:
+                bot.generate_layperson_report()
         
     else:
         print("\nNo emotion data was captured")

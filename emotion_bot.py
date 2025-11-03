@@ -201,44 +201,111 @@ class EmotionBot:
             print(f"DeepFace analysis failed: {e}")
             return None
 
-    def draw_emotion_wheel(self, frame, arousal, valence, x_offset=20, y_offset=20, radius=80):
-        """Draw a real-time emotion wheel on the frame"""
+    def draw_emotion_wheel(self, frame, arousal, valence, x_offset=20, y_offset=20, radius=100):
+        """Draw an enhanced, user-friendly emotion wheel on the frame"""
         center_x = x_offset + radius
         center_y = y_offset + radius
         
-        # Draw outer circle
-        cv2.circle(frame, (center_x, center_y), radius, (100, 100, 100), 2)
+        # Draw gradient background for quadrants
+        overlay = frame.copy()
+        
+        # Create quadrant colors (subtle backgrounds)
+        # Excited quadrant (top right) - warm yellow
+        pts_excited = np.array([[center_x, center_y], [center_x + radius, center_y], 
+                               [center_x + radius, center_y - radius], [center_x, center_y - radius]], np.int32)
+        cv2.fillPoly(overlay, [pts_excited], (100, 200, 255))
+        
+        # Agitated quadrant (top left) - orange/red
+        pts_agitated = np.array([[center_x, center_y], [center_x - radius, center_y], 
+                                [center_x - radius, center_y - radius], [center_x, center_y - radius]], np.int32)
+        cv2.fillPoly(overlay, [pts_agitated], (0, 100, 255))
+        
+        # Calm quadrant (bottom right) - cool green
+        pts_calm = np.array([[center_x, center_y], [center_x + radius, center_y], 
+                            [center_x + radius, center_y + radius], [center_x, center_y + radius]], np.int32)
+        cv2.fillPoly(overlay, [pts_calm], (100, 255, 150))
+        
+        # Depressed quadrant (bottom left) - cool blue
+        pts_depressed = np.array([[center_x, center_y], [center_x - radius, center_y], 
+                                 [center_x - radius, center_y + radius], [center_x, center_y + radius]], np.int32)
+        cv2.fillPoly(overlay, [pts_depressed], (200, 150, 100))
+        
+        # Blend overlay with original frame
+        cv2.addWeighted(overlay, 0.2, frame, 0.8, 0, frame)
+        
+        # Draw outer circle with thicker border
+        cv2.circle(frame, (center_x, center_y), radius, (70, 70, 70), 3)
+        
+        # Draw concentric circles for intensity levels
+        for i in range(1, 4):
+            inner_radius = int(radius * i / 4)
+            cv2.circle(frame, (center_x, center_y), inner_radius, (120, 120, 120), 1)
         
         # Draw quadrant lines
-        cv2.line(frame, (center_x - radius, center_y), (center_x + radius, center_y), (100, 100, 100), 1)
-        cv2.line(frame, (center_x, center_y - radius), (center_x, center_y + radius), (100, 100, 100), 1)
+        cv2.line(frame, (center_x - radius, center_y), (center_x + radius, center_y), (70, 70, 70), 2)
+        cv2.line(frame, (center_x, center_y - radius), (center_x, center_y + radius), (70, 70, 70), 2)
         
-        # Draw quadrant labels
+        # Enhanced quadrant labels with better positioning and colors
         font = cv2.FONT_HERSHEY_SIMPLEX
-        font_scale = 0.4
+        font_scale = 0.6
+        thickness = 2
         
-        # Excited (top right)
-        cv2.putText(frame, "Excited", (center_x + 10, center_y - 40), font, font_scale, (0, 255, 255), 1)
-        # Agitated (top left)
-        cv2.putText(frame, "Agitated", (center_x - 70, center_y - 40), font, font_scale, (0, 100, 255), 1)
-        # Calm (bottom right)
-        cv2.putText(frame, "Calm", (center_x + 10, center_y + 50), font, font_scale, (100, 255, 100), 1)
-        # Depressed (bottom left)
-        cv2.putText(frame, "Depressed", (center_x - 70, center_y + 50), font, font_scale, (150, 150, 255), 1)
+        # Excited quadrant
+        cv2.putText(frame, "EXCITED", (center_x + 15, center_y - 45), font, font_scale, (0, 150, 255), thickness)
+        cv2.putText(frame, "Energized", (center_x + 15, center_y - 25), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (0, 150, 255), 1)
         
-        # Draw axis labels
-        cv2.putText(frame, "Positive", (center_x + radius + 5, center_y), font, font_scale, (100, 255, 100), 1)
-        cv2.putText(frame, "Negative", (center_x - radius - 60, center_y), font, font_scale, (100, 100, 255), 1)
-        cv2.putText(frame, "Exciting", (center_x - 20, center_y - radius - 10), font, font_scale, (255, 255, 100), 1)
-        cv2.putText(frame, "Calming", (center_x - 20, center_y + radius + 20), font, font_scale, (255, 150, 150), 1)
+        # Agitated quadrant  
+        cv2.putText(frame, "STRESSED", (center_x - 85, center_y - 45), font, font_scale, (0, 50, 255), thickness)
+        cv2.putText(frame, "Anxious", (center_x - 85, center_y - 25), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (0, 50, 255), 1)
         
-        # Calculate position of current emotion
-        emotion_x = int(center_x + valence * radius * 0.8)
-        emotion_y = int(center_y - arousal * radius * 0.8)  # Negative because y increases downward
+        # Calm quadrant
+        cv2.putText(frame, "PEACEFUL", (center_x + 15, center_y + 45), font, font_scale, (50, 200, 50), thickness)
+        cv2.putText(frame, "Relaxed", (center_x + 15, center_y + 65), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (50, 200, 50), 1)
         
-        # Draw current emotion point
+        # Depressed quadrant
+        cv2.putText(frame, "TIRED", (center_x - 85, center_y + 45), font, font_scale, (150, 100, 50), thickness)
+        cv2.putText(frame, "Low mood", (center_x - 85, center_y + 65), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (150, 100, 50), 1)
+        
+        # Draw clearer axis labels
+        cv2.putText(frame, "GOOD MOOD", (center_x + radius + 10, center_y - 5), font, 0.5, (50, 200, 50), 2)
+        cv2.putText(frame, "BAD MOOD", (center_x - radius - 80, center_y - 5), font, 0.5, (50, 50, 200), 2)
+        cv2.putText(frame, "HIGH ENERGY", (center_x - 45, center_y - radius - 15), font, 0.5, (255, 200, 0), 2)
+        cv2.putText(frame, "LOW ENERGY", (center_x - 40, center_y + radius + 25), font, 0.5, (100, 100, 200), 2)
+        
+        # Calculate position of current emotion with bounds checking
+        emotion_x = int(center_x + max(-radius*0.9, min(radius*0.9, valence * radius * 0.8)))
+        emotion_y = int(center_y - max(-radius*0.9, min(radius*0.9, arousal * radius * 0.8)))
+        
+        # Draw emotion trail (last few positions for smoothness)
+        if hasattr(self, 'emotion_positions'):
+            if len(self.emotion_positions) > 10:
+                self.emotion_positions.pop(0)
+        else:
+            self.emotion_positions = []
+        
+        self.emotion_positions.append((emotion_x, emotion_y))
+        
+        # Draw trail
+        for i, pos in enumerate(self.emotion_positions[:-1]):
+            alpha = i / len(self.emotion_positions)
+            trail_color = (int(100 * alpha), int(100 * alpha), int(255 * alpha))
+            cv2.circle(frame, pos, 3, trail_color, -1)
+        
+        # Draw current emotion point with pulsing effect
+        pulse_radius = 12 + int(3 * np.sin(len(self.emotion_positions) * 0.3))
+        cv2.circle(frame, (emotion_x, emotion_y), pulse_radius, (255, 255, 255), 2)
         cv2.circle(frame, (emotion_x, emotion_y), 8, (0, 0, 255), -1)
-        cv2.circle(frame, (emotion_x, emotion_y), 12, (255, 255, 255), 2)
+        
+        # Add intensity indicator
+        intensity = np.sqrt(arousal**2 + valence**2)
+        intensity_text = f"Intensity: {intensity:.2f}"
+        cv2.putText(frame, intensity_text, (x_offset, y_offset + 2*radius + 30), 
+                   cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
+        
+        # Add current quadrant text
+        current_quadrant = self.get_emotion_quadrant(arousal, valence)
+        cv2.putText(frame, f"Current: {current_quadrant.upper()}", (x_offset, y_offset + 2*radius + 50), 
+                   cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 255), 2)
         
         return frame
 
@@ -629,6 +696,270 @@ class EmotionBot:
                 }
         
         return summary
+    
+    def plot_heatmap(self, save_path=None, bins=20):
+        """Create a heatmap showing emotion distribution in arousal-valence space"""
+        if not self.emotion_data:
+            print("No emotion data available for heatmap")
+            return
+        
+        df = self.get_dataframe()
+        
+        # Create figure with subplots
+        fig, axes = plt.subplots(2, 2, figsize=(15, 12))
+        fig.suptitle('Emotion Distribution Heatmaps', fontsize=16, fontweight='bold')
+        
+        # 1. Arousal-Valence density heatmap
+        ax1 = axes[0, 0]
+        arousal_vals = df['arousal'].values
+        valence_vals = df['valence'].values
+        
+        h1 = ax1.hist2d(valence_vals, arousal_vals, bins=bins, cmap='YlOrRd', alpha=0.8)
+        ax1.set_xlabel('Valence (Negative ← → Positive)')
+        ax1.set_ylabel('Arousal (Calm ← → Exciting)')
+        ax1.set_title('Arousal-Valence Density')
+        ax1.grid(True, alpha=0.3)
+        ax1.axhline(y=0, color='black', linestyle='--', alpha=0.5)
+        ax1.axvline(x=0, color='black', linestyle='--', alpha=0.5)
+        
+        # Add quadrant labels
+        ax1.text(0.7, 0.7, 'Excited', ha='center', va='center', fontsize=10, fontweight='bold')
+        ax1.text(-0.7, 0.7, 'Agitated', ha='center', va='center', fontsize=10, fontweight='bold')
+        ax1.text(0.7, -0.7, 'Calm', ha='center', va='center', fontsize=10, fontweight='bold')
+        ax1.text(-0.7, -0.7, 'Depressed', ha='center', va='center', fontsize=10, fontweight='bold')
+        
+        plt.colorbar(h1[3], ax=ax1, label='Frequency')
+        
+        # 2. Intensity heatmap
+        ax2 = axes[0, 1]
+        intensity_vals = df['intensity'].values
+        h2 = ax2.hist2d(valence_vals, arousal_vals, bins=bins, weights=intensity_vals, cmap='plasma', alpha=0.8)
+        ax2.set_xlabel('Valence (Negative ← → Positive)')
+        ax2.set_ylabel('Arousal (Calm ← → Exciting)')
+        ax2.set_title('Emotional Intensity Distribution')
+        ax2.grid(True, alpha=0.3)
+        ax2.axhline(y=0, color='white', linestyle='--', alpha=0.7)
+        ax2.axvline(x=0, color='white', linestyle='--', alpha=0.7)
+        plt.colorbar(h2[3], ax=ax2, label='Average Intensity')
+        
+        # 3. Dominant emotion heatmap
+        ax3 = axes[1, 0]
+        emotions = ['angry', 'disgust', 'fear', 'happy', 'sad', 'surprise', 'neutral']
+        emotion_colors = {
+            'angry': 0, 'disgust': 1, 'fear': 2, 'happy': 3, 
+            'sad': 4, 'surprise': 5, 'neutral': 6
+        }
+        
+        dominant_emotions = []
+        for _, row in df.iterrows():
+            emotion_scores = {emotion: row[emotion] for emotion in emotions if emotion in row}
+            dominant = max(emotion_scores, key=emotion_scores.get)
+            dominant_emotions.append(emotion_colors[dominant])
+        
+        scatter = ax3.scatter(valence_vals, arousal_vals, c=dominant_emotions, 
+                            cmap='tab10', alpha=0.7, s=30)
+        ax3.set_xlabel('Valence (Negative ← → Positive)')
+        ax3.set_ylabel('Arousal (Calm ← → Exciting)')
+        ax3.set_title('Dominant Emotion by Position')
+        ax3.grid(True, alpha=0.3)
+        ax3.axhline(y=0, color='black', linestyle='--', alpha=0.5)
+        ax3.axvline(x=0, color='black', linestyle='--', alpha=0.5)
+        
+        # Create custom legend for emotions
+        legend_elements = [plt.Line2D([0], [0], marker='o', color='w', 
+                                    markerfacecolor=plt.cm.tab10(emotion_colors[emotion]/9), 
+                                    markersize=8, label=emotion.capitalize()) 
+                         for emotion in emotions]
+        ax3.legend(handles=legend_elements, loc='upper left', bbox_to_anchor=(1.05, 1))
+        
+        # 4. Time evolution heatmap
+        ax4 = axes[1, 1]
+        if 'elapsed_seconds' in df.columns:
+            time_vals = df['elapsed_seconds'].values
+            h4 = ax4.hist2d(time_vals, arousal_vals, bins=bins, cmap='viridis', alpha=0.8)
+            ax4.set_xlabel('Time (seconds)')
+            ax4.set_ylabel('Arousal (Calm ← → Exciting)')
+            ax4.set_title('Arousal Evolution Over Time')
+            ax4.grid(True, alpha=0.3)
+            ax4.axhline(y=0, color='white', linestyle='--', alpha=0.7)
+            plt.colorbar(h4[3], ax=ax4, label='Frequency')
+        else:
+            ax4.text(0.5, 0.5, 'No time data available', ha='center', va='center', 
+                    transform=ax4.transAxes, fontsize=12)
+            ax4.set_title('Time Evolution (No Data)')
+        
+        plt.tight_layout()
+        
+        if save_path:
+            plt.savefig(save_path, dpi=300, bbox_inches='tight')
+        
+        plt.show()
+    
+    def generate_layperson_report(self, save_path=None):
+        """Generate a simple, easy-to-understand emotion report for laypeople"""
+        if not self.emotion_data:
+            print("No emotion data available for report")
+            return
+        
+        df = self.get_dataframe()
+        
+        # Create a clean, simple report figure
+        fig = plt.figure(figsize=(16, 10))
+        gs = fig.add_gridspec(3, 3, hspace=0.3, wspace=0.3)
+        
+        # Main title
+        fig.suptitle('Your Emotion Report - Easy to Understand', fontsize=20, fontweight='bold', y=0.95)
+        
+        # 1. Overall mood pie chart (top left)
+        ax1 = fig.add_subplot(gs[0, 0])
+        emotions = ['happy', 'neutral', 'sad', 'angry', 'fear', 'surprise', 'disgust']
+        emotion_totals = {emotion: df[emotion].sum() for emotion in emotions if emotion in df.columns}
+        
+        # Simplify to main emotions
+        main_emotions = {'Positive': emotion_totals.get('happy', 0) + emotion_totals.get('surprise', 0),
+                        'Neutral': emotion_totals.get('neutral', 0),
+                        'Worried': emotion_totals.get('fear', 0) + emotion_totals.get('sad', 0),
+                        'Upset': emotion_totals.get('angry', 0) + emotion_totals.get('disgust', 0)}
+        
+        colors = ['#90EE90', '#D3D3D3', '#FFB6C1', '#FFA07A']
+        wedges, texts, autotexts = ax1.pie(main_emotions.values(), labels=main_emotions.keys(), 
+                                          autopct='%1.1f%%', colors=colors, startangle=90)
+        ax1.set_title('Overall Mood Distribution', fontsize=14, fontweight='bold')
+        
+        # 2. Energy levels over time (top middle)
+        ax2 = fig.add_subplot(gs[0, 1])
+        time_data = np.arange(len(df))
+        energy_levels = ['Very Low' if x < -0.5 else 'Low' if x < -0.2 else 'Medium' if x < 0.3 else 'High' if x < 0.6 else 'Very High' 
+                        for x in df['arousal']]
+        energy_colors = {'Very Low': '#4169E1', 'Low': '#87CEEB', 'Medium': '#FFFF00', 'High': '#FFA500', 'Very High': '#FF4500'}
+        
+        for i, (level, color) in enumerate(energy_colors.items()):
+            mask = [x == level for x in energy_levels]
+            if any(mask):
+                ax2.scatter([j for j, m in enumerate(mask) if m], 
+                           [df['arousal'].iloc[j] for j, m in enumerate(mask) if m], 
+                           c=color, label=level, s=30, alpha=0.7)
+        
+        ax2.set_xlabel('Time →')
+        ax2.set_ylabel('Energy Level')
+        ax2.set_title('Your Energy Throughout Session', fontsize=14, fontweight='bold')
+        ax2.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+        ax2.grid(True, alpha=0.3)
+        
+        # 3. Mood levels over time (top right)
+        ax3 = fig.add_subplot(gs[0, 2])
+        mood_levels = ['Very Negative' if x < -0.5 else 'Negative' if x < -0.2 else 'Neutral' if x < 0.2 else 'Positive' if x < 0.5 else 'Very Positive' 
+                      for x in df['valence']]
+        mood_colors = {'Very Negative': '#8B0000', 'Negative': '#CD5C5C', 'Neutral': '#D3D3D3', 'Positive': '#90EE90', 'Very Positive': '#00FF00'}
+        
+        for level, color in mood_colors.items():
+            mask = [x == level for x in mood_levels]
+            if any(mask):
+                ax3.scatter([j for j, m in enumerate(mask) if m], 
+                           [df['valence'].iloc[j] for j, m in enumerate(mask) if m], 
+                           c=color, label=level, s=30, alpha=0.7)
+        
+        ax3.set_xlabel('Time →')
+        ax3.set_ylabel('Mood Level')
+        ax3.set_title('Your Mood Throughout Session', fontsize=14, fontweight='bold')
+        ax3.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+        ax3.grid(True, alpha=0.3)
+        
+        # 4. Emotional states distribution (middle row, full width)
+        ax4 = fig.add_subplot(gs[1, :])
+        quadrant_counts = df['quadrant'].value_counts()
+        quadrant_colors = {'Excited': '#FFD700', 'Agitated': '#FF6347', 'Calm': '#90EE90', 'Depressed': '#87CEEB'}
+        
+        bars = ax4.bar(quadrant_counts.index, quadrant_counts.values, 
+                      color=[quadrant_colors.get(q, '#D3D3D3') for q in quadrant_counts.index])
+        ax4.set_title('Time Spent in Different Emotional States', fontsize=16, fontweight='bold')
+        ax4.set_ylabel('Number of Moments')
+        
+        # Add percentage labels on bars
+        total_moments = len(df)
+        for bar, count in zip(bars, quadrant_counts.values):
+            percentage = (count / total_moments) * 100
+            ax4.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 0.5, 
+                    f'{percentage:.1f}%', ha='center', va='bottom', fontweight='bold')
+        
+        # 5. Key insights text (bottom left)
+        ax5 = fig.add_subplot(gs[2, 0])
+        ax5.axis('off')
+        
+        # Calculate insights
+        dominant_emotion = max(main_emotions, key=main_emotions.get)
+        avg_energy = df['arousal'].mean()
+        avg_mood = df['valence'].mean()
+        most_common_state = quadrant_counts.index[0]
+        
+        energy_desc = "high" if avg_energy > 0.2 else "low" if avg_energy < -0.2 else "moderate"
+        mood_desc = "positive" if avg_mood > 0.2 else "negative" if avg_mood < -0.2 else "neutral"
+        
+        insights_text = f"""KEY INSIGHTS:
+        
+• Most common feeling: {dominant_emotion}
+• Average energy: {energy_desc.capitalize()}
+• Average mood: {mood_desc.capitalize()}
+• Spent most time: {most_common_state}
+
+SUMMARY:
+You showed mostly {dominant_emotion.lower()} 
+emotions with {energy_desc} energy levels 
+and a generally {mood_desc} mood."""
+        
+        ax5.text(0.05, 0.95, insights_text, transform=ax5.transAxes, fontsize=11, 
+                verticalalignment='top', bbox=dict(boxstyle="round,pad=0.3", facecolor="lightblue", alpha=0.5))
+        
+        # 6. Recommendations (bottom middle)
+        ax6 = fig.add_subplot(gs[2, 1])
+        ax6.axis('off')
+        
+        # Generate simple recommendations
+        recommendations = []
+        if avg_energy < -0.3:
+            recommendations.append("• Try energizing activities")
+            recommendations.append("• Get enough sleep")
+        elif avg_energy > 0.5:
+            recommendations.append("• Practice relaxation techniques")
+            recommendations.append("• Take breaks when needed")
+        
+        if avg_mood < -0.3:
+            recommendations.append("• Engage in mood-boosting activities")
+            recommendations.append("• Connect with supportive people")
+        elif avg_mood > 0.3:
+            recommendations.append("• Keep doing what makes you happy!")
+        
+        if not recommendations:
+            recommendations = ["• You seem well-balanced!", "• Continue your current approach"]
+        
+        rec_text = "SUGGESTIONS:\n\n" + "\n".join(recommendations)
+        ax6.text(0.05, 0.95, rec_text, transform=ax6.transAxes, fontsize=11, 
+                verticalalignment='top', bbox=dict(boxstyle="round,pad=0.3", facecolor="lightgreen", alpha=0.5))
+        
+        # 7. Emotion timeline (bottom right)
+        ax7 = fig.add_subplot(gs[2, 2])
+        # Simple timeline showing emotional journey
+        timeline_colors = [quadrant_colors.get(q, '#D3D3D3') for q in df['quadrant']]
+        ax7.scatter(range(len(df)), [0]*len(df), c=timeline_colors, s=50, alpha=0.7)
+        ax7.set_xlim(-1, len(df))
+        ax7.set_ylim(-0.5, 0.5)
+        ax7.set_xlabel('Time →')
+        ax7.set_title('Your Emotional Journey', fontsize=12, fontweight='bold')
+        ax7.set_yticks([])
+        
+        # Add legend for timeline
+        legend_elements = [plt.Line2D([0], [0], marker='o', color='w', 
+                                    markerfacecolor=color, markersize=8, label=state) 
+                         for state, color in quadrant_colors.items()]
+        ax7.legend(handles=legend_elements, loc='upper right', fontsize=8)
+        
+        plt.tight_layout()
+        
+        if save_path:
+            plt.savefig(save_path, dpi=300, bbox_inches='tight')
+            print(f"Layperson report saved to {save_path}")
+        
+        plt.show()
     
     def clear_data(self):
         """Clear stored emotion data"""
