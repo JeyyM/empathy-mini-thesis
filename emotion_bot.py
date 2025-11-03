@@ -81,21 +81,21 @@ class EmotionBot:
         
         # Enhanced emotion-to-dimension mappings for circumplex model
         self.emotion_dimensions = {
-            'happy': {'arousal': 0.8, 'valence': 0.9, 'excitement': 0.9, 'positivity': 0.9},
+            'happy': {'arousal': 0.2, 'valence': 0.8, 'excitement': 0.3, 'positivity': 0.8},
             'surprise': {'arousal': 0.9, 'valence': 0.1, 'excitement': 0.8, 'positivity': 0.3},
             'angry': {'arousal': 0.8, 'valence': -0.8, 'excitement': 0.7, 'positivity': -0.8},
             'fear': {'arousal': 0.7, 'valence': -0.6, 'excitement': 0.6, 'positivity': -0.7},
             'sad': {'arousal': -0.6, 'valence': -0.7, 'excitement': -0.5, 'positivity': -0.8},
-            'disgust': {'arousal': 0.3, 'valence': -0.8, 'excitement': 0.2, 'positivity': -0.7},
-            'neutral': {'arousal': 0.0, 'valence': 0.0, 'excitement': 0.0, 'positivity': 0.0}
+            'disgust': {'arousal': -0.2, 'valence': -0.8, 'excitement': -0.3, 'positivity': -0.7},
+            'neutral': {'arousal': -0.4, 'valence': 0.2, 'excitement': -0.5, 'positivity': 0.1}
         }
         
         # Quadrant mappings for circumplex model
         self.quadrant_labels = {
             (1, 1): "Excited",      # High arousal, positive valence
-            (1, -1): "Frustrated",  # High arousal, negative valence
-            (-1, 1): "Relaxed",     # Low arousal, positive valence
-            (-1, -1): "Calming"     # Low arousal, negative valence
+            (1, -1): "Agitated",    # High arousal, negative valence  
+            (-1, 1): "Calm",        # Low arousal, positive valence
+            (-1, -1): "Depressed"   # Low arousal, negative valence
         }
         
         self.emotion_data = []
@@ -219,12 +219,12 @@ class EmotionBot:
         
         # Excited (top right)
         cv2.putText(frame, "Excited", (center_x + 10, center_y - 40), font, font_scale, (0, 255, 255), 1)
-        # Frustrated (top left)
-        cv2.putText(frame, "Frustrated", (center_x - 70, center_y - 40), font, font_scale, (0, 100, 255), 1)
-        # Relaxed (bottom right)
-        cv2.putText(frame, "Relaxed", (center_x + 10, center_y + 50), font, font_scale, (100, 255, 100), 1)
-        # Calming (bottom left)
-        cv2.putText(frame, "Calming", (center_x - 60, center_y + 50), font, font_scale, (150, 150, 255), 1)
+        # Agitated (top left)
+        cv2.putText(frame, "Agitated", (center_x - 70, center_y - 40), font, font_scale, (0, 100, 255), 1)
+        # Calm (bottom right)
+        cv2.putText(frame, "Calm", (center_x + 10, center_y + 50), font, font_scale, (100, 255, 100), 1)
+        # Depressed (bottom left)
+        cv2.putText(frame, "Depressed", (center_x - 70, center_y + 50), font, font_scale, (150, 150, 255), 1)
         
         # Draw axis labels
         cv2.putText(frame, "Positive", (center_x + radius + 5, center_y), font, font_scale, (100, 255, 100), 1)
