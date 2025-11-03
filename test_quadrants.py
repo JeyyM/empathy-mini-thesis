@@ -2,13 +2,13 @@
 
 # Test script to verify quadrant mapping logic
 emotion_dimensions = {
-    'happy': {'arousal': 0.2, 'valence': 0.8, 'excitement': 0.3, 'positivity': 0.8},
+    'happy': {'arousal': 0.5, 'valence': 0.8, 'excitement': 0.6, 'positivity': 0.8},
     'surprise': {'arousal': 0.9, 'valence': 0.1, 'excitement': 0.8, 'positivity': 0.3},
     'angry': {'arousal': 0.8, 'valence': -0.8, 'excitement': 0.7, 'positivity': -0.8},
     'fear': {'arousal': 0.7, 'valence': -0.6, 'excitement': 0.6, 'positivity': -0.7},
-    'sad': {'arousal': -0.6, 'valence': -0.7, 'excitement': -0.5, 'positivity': -0.8},
-    'disgust': {'arousal': -0.2, 'valence': -0.8, 'excitement': -0.3, 'positivity': -0.7},
-    'neutral': {'arousal': -0.4, 'valence': 0.2, 'excitement': -0.5, 'positivity': 0.1}
+    'sad': {'arousal': -0.8, 'valence': -0.7, 'excitement': -0.7, 'positivity': -0.8},
+    'disgust': {'arousal': -0.4, 'valence': -0.8, 'excitement': -0.5, 'positivity': -0.7},
+    'neutral': {'arousal': -0.6, 'valence': 0.3, 'excitement': -0.7, 'positivity': 0.2}
 }
 
 quadrant_labels = {
