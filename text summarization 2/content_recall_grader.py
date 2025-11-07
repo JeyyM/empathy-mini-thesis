@@ -182,14 +182,14 @@ class ContentRecallGrader:
         factual_accuracy = self.check_for_contradictions(original, summary)
         
         # Human summary adjustments - humans naturally paraphrase more than AI
-        # Boost scores to account for natural human summarization patterns
-        human_adjusted_semantic = min(1.0, semantic_similarity * 1.4)  # Humans paraphrase naturally
-        human_adjusted_topics = min(1.0, topic_coverage * 1.2)         # Focus on key themes is good
+        # Boost scores significantly to account for natural human summarization patterns
+        human_adjusted_semantic = min(1.0, semantic_similarity * 2.2)  # Major boost for paraphrasing
+        human_adjusted_topics = min(1.0, topic_coverage * 1.5)         # Strong boost for theme coverage
         
-        # Weights adjusted for human summary evaluation
+        # Weights heavily favor topic coverage over exact semantic matching
         weights = {
-            'semantic_similarity': 0.35,  # Less emphasis on exact semantic matching
-            'topic_coverage': 0.55,       # More credit for covering main themes
+            'semantic_similarity': 0.25,  # Minimal emphasis on exact semantic matching
+            'topic_coverage': 0.65,       # Heavy emphasis on covering main themes  
             'factual_accuracy': 0.10      # No major contradictions?
         }
         
@@ -205,10 +205,10 @@ class ContentRecallGrader:
         
         # Realistic grading scale for human content recall
         def get_grade(pct):
-            if pct >= 70: return 'A'    # Excellent human content recall
-            elif pct >= 55: return 'B'  # Good human content recall
-            elif pct >= 40: return 'C'  # Adequate human content recall
-            elif pct >= 25: return 'D'  # Poor human content recall
+            if pct >= 80: return 'A'    # Excellent human content recall
+            elif pct >= 65: return 'B'  # Good human content recall
+            elif pct >= 50: return 'C'  # Adequate human content recall
+            elif pct >= 35: return 'D'  # Poor human content recall
             else: return 'F'            # Very poor human content recall
         
         return {
