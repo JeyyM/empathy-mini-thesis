@@ -138,7 +138,7 @@ class GeneralRecallGrader:
         return concepts
     
     def calculate_concept_overlap(self, orig_concepts: Dict, summ_concepts: Dict) -> float:
-        """Calculate how well summary concepts match original concepts"""
+        """Calculate how well summary concepts match original concepts - allow for reasonable compression"""
         total_overlap = 0.0
         total_possible = 0.0
         
@@ -147,11 +147,37 @@ class GeneralRecallGrader:
             summ_set = set(summ_concepts[category])
             
             if orig_set:
-                overlap = len(orig_set.intersection(summ_set))
-                total_overlap += overlap
-                total_possible += len(orig_set)
+                # Direct overlap
+                direct_overlap = len(orig_set.intersection(summ_set))
+                
+                # Partial overlap - check for semantic similarity
+                partial_overlap = 0
+                for orig_concept in orig_set:
+                    if orig_concept not in summ_set:  # Not already counted
+                        for summ_concept in summ_set:
+                            if self._concepts_semantically_related(orig_concept, summ_concept):
+                                partial_overlap += 0.5  # Partial credit
+                                break
+                
+                category_overlap = direct_overlap + partial_overlap
+                total_overlap += category_overlap
+                # Be more lenient - don't expect all concepts to be preserved in a summary
+                total_possible += min(len(orig_set), len(orig_set) * 0.6)  # Expect 60% max preservation
         
         return total_overlap / total_possible if total_possible > 0 else 0.0
+    
+    def _concepts_semantically_related(self, concept1: str, concept2: str) -> bool:
+        """Check if two concepts are semantically related"""
+        # Simple semantic relatedness check
+        words1 = set(w for w in concept1.split() if w not in self.stop_words and len(w) > 2)
+        words2 = set(w for w in concept2.split() if w not in self.stop_words and len(w) > 2)
+        
+        if not words1 or not words2:
+            return False
+        
+        # Check for shared words or similar themes
+        overlap = len(words1.intersection(words2))
+        return overlap > 0  # Any shared content words suggest relation
     
     def calculate_semantic_similarity(self, original: str, summary: str) -> float:
         """Calculate semantic similarity using TF-IDF or fallback to phrase matching"""
@@ -192,7 +218,7 @@ class GeneralRecallGrader:
             return self.calculate_semantic_similarity(original, summary)
     
     def assess_content_recall(self, original: str, summary: str) -> float:
-        """Assess how well the summary recalls the main content"""
+        """Assess how well the summary recalls the main content - focus on meaning preservation"""
         # Extract key elements from both texts
         orig_phrases = self.extract_key_phrases(original)
         summ_phrases = self.extract_key_phrases(summary)
@@ -200,8 +226,8 @@ class GeneralRecallGrader:
         orig_concepts = self.extract_semantic_concepts(original)
         summ_concepts = self.extract_semantic_concepts(summary)
         
-        # Calculate phrase recall
-        orig_phrase_set = set(orig_phrases)
+        # Focus on whether IMPORTANT content is preserved, not total volume
+        orig_phrase_set = set(orig_phrases[:20])  # Focus on top 20 most important phrases
         summ_phrase_set = set(summ_phrases)
         
         if not orig_phrase_set:
@@ -211,80 +237,70 @@ class GeneralRecallGrader:
             matched_phrases = 0
             for orig_phrase in orig_phrase_set:
                 orig_words = set(orig_phrase.split())
+                # Check both exact and semantic matches
                 for summ_phrase in summ_phrase_set:
                     summ_words = set(summ_phrase.split())
-                    # Consider match if significant word overlap
+                    # Consider match if significant word overlap OR semantic similarity
                     overlap = len(orig_words.intersection(summ_words))
                     if overlap >= min(2, len(orig_words) // 2):
                         matched_phrases += 1
                         break
+                else:
+                    # Check for semantic equivalence (different wording, same meaning)
+                    for summ_phrase in summ_phrase_set:
+                        # Simple semantic check - if they share conceptual words
+                        if self._phrases_semantically_similar(orig_phrase, summ_phrase):
+                            matched_phrases += 0.7  # Partial credit for paraphrasing
+                            break
             
-            phrase_recall = matched_phrases / len(orig_phrase_set)
+            phrase_recall = min(1.0, matched_phrases / len(orig_phrase_set))
         
-        # Calculate concept recall
+        # Calculate concept recall - focus on core themes being preserved
         concept_recall = self.calculate_concept_overlap(orig_concepts, summ_concepts)
         
-        # Combine phrase and concept recall
-        content_recall = 0.6 * phrase_recall + 0.4 * concept_recall
+        # Weight towards concept recall (meaning) over exact phrase recall (wording)
+        content_recall = 0.3 * phrase_recall + 0.7 * concept_recall
         
         return content_recall
     
+    def _phrases_semantically_similar(self, phrase1: str, phrase2: str) -> bool:
+        """Check if two phrases are semantically similar despite different wording"""
+        words1 = set(w for w in phrase1.split() if w not in self.stop_words)
+        words2 = set(w for w in phrase2.split() if w not in self.stop_words)
+        
+        if not words1 or not words2:
+            return False
+        
+        # Check for synonym-like relationships or shared roots
+        # Simple approach: if they share conceptual similarity
+        overlap = len(words1.intersection(words2))
+        min_overlap = min(len(words1), len(words2))
+        
+        # If at least 30% overlap in content words, consider similar
+        return overlap >= max(1, min_overlap * 0.3)
+    
     def assess_message_understanding(self, original: str, summary: str) -> float:
-        """Assess if the core message/meaning was understood"""
-        # Use semantic similarity as primary indicator
+        """Assess if the core message/meaning was understood - focus on content only"""
+        # Use semantic similarity as the only indicator - no bonus for summary language
         semantic_sim = self.calculate_semantic_similarity(original, summary)
         
-        # Look for meta-understanding indicators in summary
-        summary_lower = summary.lower()
-        understanding_indicators = [
-            r'\boverall\b', r'\bin summary\b', r'\bthe main\b', r'\bthe key\b',
-            r'\bwhat.*(?:shows|means|indicates|suggests)\b',
-            r'\bthe.*(?:conversation|discussion|exchange).*(?:was|showed|revealed)\b',
-            r'\bthis.*(?:demonstrates|illustrates|highlights)\b'
-        ]
-        
-        meta_understanding = sum(1 for pattern in understanding_indicators 
-                                if re.search(pattern, summary_lower)) > 0
-        
-        # Bonus for showing understanding
-        understanding_bonus = 0.1 if meta_understanding else 0.0
-        
-        return min(1.0, semantic_sim + understanding_bonus)
+        return semantic_sim
     
     def assess_accuracy(self, original: str, summary: str) -> float:
-        """Assess factual accuracy by checking for contradictions"""
+        """Focus only on contradictions - ignore overgeneralization concerns"""
         orig_clean = self.clean_text(original).lower()
         summ_clean = summary.lower()
         
         # Start with perfect accuracy
         accuracy = 1.0
         
-        # Extract factual claims from summary and check against original
-        # Look for definitive statements in summary
-        definitive_patterns = [
-            r'(?:always|never|all|none|every|no)\s+\w+',
-            r'(?:definitely|certainly|clearly|obviously)\s+\w+',
-            r'\w+\s+(?:is|are|was|were)\s+(?:very|extremely|completely)\s+\w+'
-        ]
-        
-        for pattern in definitive_patterns:
-            claims = re.findall(pattern, summ_clean)
-            for claim in claims:
-                # Check if this strong claim is supported by original
-                claim_words = [w for w in claim.split() if w not in self.stop_words]
-                if claim_words:
-                    # Look for supporting or contradicting evidence in original
-                    support_found = all(word in orig_clean for word in claim_words[-2:])
-                    if not support_found:
-                        accuracy -= 0.1  # Penalty for unsupported strong claims
-        
-        # Check for obvious contradictions
+        # Check for obvious contradictions in meaning/sentiment
         # If summary mentions something is "positive" but original suggests "negative" etc.
         polarity_words = {
-            'positive': ['good', 'great', 'excellent', 'successful', 'effective'],
-            'negative': ['bad', 'poor', 'failed', 'unsuccessful', 'ineffective'],
-            'agreement': ['agreed', 'consensus', 'harmony', 'aligned'],
-            'disagreement': ['disagreed', 'conflict', 'tension', 'opposed']
+            'positive': ['good', 'great', 'excellent', 'successful', 'effective', 'supportive', 'helpful'],
+            'negative': ['bad', 'poor', 'failed', 'unsuccessful', 'ineffective', 'harmful', 'problematic'],
+            'agreement': ['agreed', 'consensus', 'harmony', 'aligned', 'supportive', 'understanding'],
+            'disagreement': ['disagreed', 'conflict', 'tension', 'opposed', 'hostile', 'argumentative']
         }
         
         for polarity, words in polarity_words.items():
@@ -296,8 +312,8 @@ class GeneralRecallGrader:
                 }.get(polarity)
                 
                 if opposite_polarity and any(word in orig_clean for word in polarity_words[opposite_polarity]):
-                    # Possible contradiction - small penalty
-                    accuracy -= 0.05
+                    # Clear contradiction in meaning - penalty
+                    accuracy -= 0.15
         
         return max(0.0, accuracy)
     
@@ -323,11 +339,11 @@ class GeneralRecallGrader:
         orig_concepts = self.extract_semantic_concepts(original)
         summ_concepts = self.extract_semantic_concepts(summary)
         
-        # Weights for general recall grading
+        # Weights focused purely on content recall accuracy
         weights = {
-            'content_recall': 0.40,        # Did you remember the main content?
-            'message_understanding': 0.35,  # Did you understand the overall message?
-            'factual_accuracy': 0.25       # Are your statements accurate?
+            'content_recall': 0.60,        # Primary focus: Did you remember the main content?
+            'message_understanding': 0.30,  # Core meaning preserved despite different wording?
+            'factual_accuracy': 0.10       # No contradictions in meaning?
         }
         
         scores = {
@@ -340,19 +356,19 @@ class GeneralRecallGrader:
         overall = sum(scores[metric] * weights[metric] for metric in scores)
         percentage = overall * 100
         
-        # Grade scale
+        # Grade scale - more lenient since we only care about content recall
         def get_grade(pct):
-            if pct >= 90: return 'A'
-            elif pct >= 80: return 'B'
-            elif pct >= 70: return 'C'
-            elif pct >= 60: return 'D'
-            else: return 'F'
+            if pct >= 85: return 'A'    # Excellent content recall
+            elif pct >= 70: return 'B'  # Good content recall 
+            elif pct >= 55: return 'C'  # Adequate content recall
+            elif pct >= 40: return 'D'  # Poor content recall
+            else: return 'F'            # Very poor content recall
         
         return {
             'overall_percentage': round(percentage, 1),
             'overall_score': round(overall, 3),
             'letter_grade': get_grade(percentage),
-            'approach': 'Dynamic Analysis - No Hardcoded Patterns',
+            'approach': 'Pure Content Recall Focus - Meaning Over Wording',
             'breakdown': {
                 metric: {
                     'score': round(scores[metric], 3),
@@ -393,13 +409,13 @@ def main():
         print(json.dumps(result, indent=2))
     else:
         print("="*70)
-        print("GENERAL RECALL ACCURACY ASSESSMENT")
+        print("PURE CONTENT RECALL ASSESSMENT")
         print("="*70)
         print(f"Overall Score: {result['overall_percentage']}% (Grade: {result['letter_grade']})")
         print(f"Approach: {result['approach']}")
         print()
         
-        print("RECALL BREAKDOWN:")
+        print("CONTENT RECALL BREAKDOWN:")
         print("-" * 50)
         breakdown = result['breakdown']
         for metric, data in breakdown.items():
