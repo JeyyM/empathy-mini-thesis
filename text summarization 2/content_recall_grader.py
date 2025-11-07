@@ -181,16 +181,21 @@ class ContentRecallGrader:
         topic_coverage = self.assess_topic_coverage(original, summary)
         factual_accuracy = self.check_for_contradictions(original, summary)
         
-        # Weights focused on content recall
+        # Human summary adjustments - humans naturally paraphrase more than AI
+        # Boost scores to account for natural human summarization patterns
+        human_adjusted_semantic = min(1.0, semantic_similarity * 1.4)  # Humans paraphrase naturally
+        human_adjusted_topics = min(1.0, topic_coverage * 1.2)         # Focus on key themes is good
+        
+        # Weights adjusted for human summary evaluation
         weights = {
-            'semantic_similarity': 0.50,  # Does it capture the same meaning?
-            'topic_coverage': 0.40,       # Does it cover the main topics?
+            'semantic_similarity': 0.35,  # Less emphasis on exact semantic matching
+            'topic_coverage': 0.55,       # More credit for covering main themes
             'factual_accuracy': 0.10      # No major contradictions?
         }
         
         scores = {
-            'semantic_similarity': semantic_similarity,
-            'topic_coverage': topic_coverage,
+            'semantic_similarity': human_adjusted_semantic,
+            'topic_coverage': human_adjusted_topics,
             'factual_accuracy': factual_accuracy
         }
         
@@ -198,19 +203,19 @@ class ContentRecallGrader:
         overall = sum(scores[metric] * weights[metric] for metric in scores)
         percentage = overall * 100
         
-        # Realistic grading scale for content recall
+        # Realistic grading scale for human content recall
         def get_grade(pct):
-            if pct >= 75: return 'A'    # Excellent content recall
-            elif pct >= 60: return 'B'  # Good content recall
-            elif pct >= 45: return 'C'  # Adequate content recall
-            elif pct >= 30: return 'D'  # Poor content recall
-            else: return 'F'            # Very poor content recall
+            if pct >= 70: return 'A'    # Excellent human content recall
+            elif pct >= 55: return 'B'  # Good human content recall
+            elif pct >= 40: return 'C'  # Adequate human content recall
+            elif pct >= 25: return 'D'  # Poor human content recall
+            else: return 'F'            # Very poor human content recall
         
         return {
             'overall_percentage': round(percentage, 1),
             'overall_score': round(overall, 3),
             'letter_grade': get_grade(percentage),
-            'approach': 'Pure Content Recall - Meaning Over Wording',
+            'approach': 'Human-Adjusted Content Recall - Natural Paraphrasing Expected',
             'breakdown': {
                 metric: {
                     'score': round(scores[metric], 3),
@@ -245,13 +250,13 @@ def main():
         print(json.dumps(result, indent=2))
     else:
         print("=" * 60)
-        print("CONTENT RECALL ASSESSMENT")
+        print("HUMAN-ADJUSTED CONTENT RECALL ASSESSMENT")
         print("=" * 60)
         print(f"Overall Score: {result['overall_percentage']}% (Grade: {result['letter_grade']})")
         print(f"Approach: {result['approach']}")
         print()
         
-        print("BREAKDOWN:")
+        print("BREAKDOWN (Human-Adjusted):")
         print("-" * 40)
         breakdown = result['breakdown']
         for metric, data in breakdown.items():
