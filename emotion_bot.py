@@ -961,6 +961,173 @@ and a generally {mood_desc} mood."""
         
         plt.show()
     
+    def plot_circle_movement_heatmap(self, save_path=None, grid_size=50):
+        """Create a heatmap showing movement patterns within the emotion circle"""
+        if not self.emotion_data:
+            print("No emotion data available for movement heatmap")
+            return
+        
+        df = self.get_dataframe()
+        
+        # Create figure
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(16, 8))
+        fig.suptitle('Emotion Circle Movement Analysis', fontsize=16, fontweight='bold')
+        
+        # Extract arousal and valence data
+        arousal_vals = df['arousal'].values
+        valence_vals = df['valence'].values
+        
+        # Create circular grid for heatmap
+        x = np.linspace(-1, 1, grid_size)
+        y = np.linspace(-1, 1, grid_size)
+        X, Y = np.meshgrid(x, y)
+        
+        # Create mask for circular boundary
+        circle_mask = X**2 + Y**2 <= 1
+        
+        # 1. Movement density heatmap (left plot)
+        H, xedges, yedges = np.histogram2d(valence_vals, arousal_vals, bins=grid_size, range=[[-1, 1], [-1, 1]])
+        H = H.T  # Transpose for correct orientation
+        
+        # Apply circular mask
+        H_masked = np.where(circle_mask, H, np.nan)
+        
+        im1 = ax1.imshow(H_masked, extent=[-1, 1, -1, 1], origin='lower', cmap='YlOrRd', alpha=0.8)
+        
+        # Draw circle boundary
+        circle = plt.Circle((0, 0), 1, fill=False, color='black', linewidth=2)
+        ax1.add_patch(circle)
+        
+        # Draw quadrant lines
+        ax1.axhline(y=0, color='black', linestyle='-', alpha=0.5, linewidth=1)
+        ax1.axvline(x=0, color='black', linestyle='-', alpha=0.5, linewidth=1)
+        
+        # Add quadrant labels
+        ax1.text(0.7, 0.7, 'EXCITED\nEnergized', ha='center', va='center', fontsize=10, fontweight='bold', 
+                bbox=dict(boxstyle="round,pad=0.3", facecolor="yellow", alpha=0.7))
+        ax1.text(-0.7, 0.7, 'STRESSED\nAnxious', ha='center', va='center', fontsize=10, fontweight='bold',
+                bbox=dict(boxstyle="round,pad=0.3", facecolor="orange", alpha=0.7))
+        ax1.text(0.7, -0.7, 'PEACEFUL\nRelaxed', ha='center', va='center', fontsize=10, fontweight='bold',
+                bbox=dict(boxstyle="round,pad=0.3", facecolor="lightgreen", alpha=0.7))
+        ax1.text(-0.7, -0.7, 'TIRED\nLow mood', ha='center', va='center', fontsize=10, fontweight='bold',
+                bbox=dict(boxstyle="round,pad=0.3", facecolor="lightblue", alpha=0.7))
+        
+        # Add axis labels
+        ax1.set_xlabel('MOOD: Bad ← → Good', fontsize=12, fontweight='bold')
+        ax1.set_ylabel('ENERGY: Low ← → High', fontsize=12, fontweight='bold')
+        ax1.set_title('Where You Spend Time\n(Movement Density)', fontsize=14, fontweight='bold')
+        
+        # Add colorbar
+        cbar1 = plt.colorbar(im1, ax=ax1, shrink=0.8)
+        cbar1.set_label('Time Spent (frequency)', fontsize=10)
+        
+        # Set equal aspect ratio and limits
+        ax1.set_xlim(-1.1, 1.1)
+        ax1.set_ylim(-1.1, 1.1)
+        ax1.set_aspect('equal')
+        
+        # 2. Movement path with intensity (right plot)
+        # Create a smooth heatmap based on trajectory
+        gaussian_grid = np.zeros((grid_size, grid_size))
+        
+        for i, (val, ar) in enumerate(zip(valence_vals, arousal_vals)):
+            # Convert to grid coordinates
+            x_idx = int((val + 1) * grid_size / 2)
+            y_idx = int((ar + 1) * grid_size / 2)
+            
+            # Ensure indices are within bounds
+            x_idx = max(0, min(grid_size - 1, x_idx))
+            y_idx = max(0, min(grid_size - 1, y_idx))
+            
+            # Add Gaussian blob around the point
+            sigma = 3  # Spread of the Gaussian
+            for dx in range(-sigma*2, sigma*2 + 1):
+                for dy in range(-sigma*2, sigma*2 + 1):
+                    nx, ny = x_idx + dx, y_idx + dy
+                    if 0 <= nx < grid_size and 0 <= ny < grid_size:
+                        distance = np.sqrt(dx**2 + dy**2)
+                        weight = np.exp(-distance**2 / (2 * sigma**2))
+                        gaussian_grid[ny, nx] += weight
+        
+        # Apply circular mask
+        gaussian_masked = np.where(circle_mask, gaussian_grid, np.nan)
+        
+        im2 = ax2.imshow(gaussian_masked, extent=[-1, 1, -1, 1], origin='lower', cmap='plasma', alpha=0.8)
+        
+        # Draw movement path
+        ax2.plot(valence_vals, arousal_vals, 'white', linewidth=2, alpha=0.8, label='Emotion Path')
+        ax2.scatter(valence_vals[0], arousal_vals[0], color='lime', s=100, marker='o', 
+                   label='Start', edgecolor='black', linewidth=2, zorder=5)
+        ax2.scatter(valence_vals[-1], arousal_vals[-1], color='red', s=100, marker='s', 
+                   label='End', edgecolor='black', linewidth=2, zorder=5)
+        
+        # Draw circle boundary
+        circle2 = plt.Circle((0, 0), 1, fill=False, color='white', linewidth=2)
+        ax2.add_patch(circle2)
+        
+        # Draw quadrant lines
+        ax2.axhline(y=0, color='white', linestyle='-', alpha=0.7, linewidth=1)
+        ax2.axvline(x=0, color='white', linestyle='-', alpha=0.7, linewidth=1)
+        
+        ax2.set_xlabel('MOOD: Bad ← → Good', fontsize=12, fontweight='bold')
+        ax2.set_ylabel('ENERGY: Low ← → High', fontsize=12, fontweight='bold')
+        ax2.set_title('Your Emotional Journey\n(Movement Path)', fontsize=14, fontweight='bold')
+        
+        # Add colorbar
+        cbar2 = plt.colorbar(im2, ax=ax2, shrink=0.8)
+        cbar2.set_label('Movement Intensity', fontsize=10)
+        
+        ax2.legend(loc='upper left', bbox_to_anchor=(0, 1))
+        ax2.set_xlim(-1.1, 1.1)
+        ax2.set_ylim(-1.1, 1.1)
+        ax2.set_aspect('equal')
+        
+        plt.tight_layout()
+        
+        if save_path:
+            plt.savefig(save_path, dpi=300, bbox_inches='tight')
+            print(f"Circle movement heatmap saved to {save_path}")
+        
+        plt.show()
+        
+        # Print movement statistics
+        print(f"\n=== Movement Analysis ===")
+        print(f"Total emotion samples: {len(df)}")
+        
+        # Calculate movement distance
+        if len(valence_vals) > 1:
+            distances = []
+            for i in range(1, len(valence_vals)):
+                dist = np.sqrt((valence_vals[i] - valence_vals[i-1])**2 + 
+                              (arousal_vals[i] - arousal_vals[i-1])**2)
+                distances.append(dist)
+            
+            total_distance = sum(distances)
+            avg_distance = np.mean(distances)
+            
+            print(f"Total movement distance: {total_distance:.2f}")
+            print(f"Average step distance: {avg_distance:.3f}")
+            print(f"Movement activity: {'High' if avg_distance > 0.1 else 'Moderate' if avg_distance > 0.05 else 'Low'}")
+        
+        # Quadrant time analysis
+        quadrant_time = df['quadrant'].value_counts()
+        print(f"\nTime in each emotional state:")
+        for quadrant, count in quadrant_time.items():
+            percentage = (count / len(df)) * 100
+            print(f"  {quadrant}: {count} moments ({percentage:.1f}%)")
+        
+        # Most extreme positions
+        max_positive = df.loc[df['valence'].idxmax()]
+        max_negative = df.loc[df['valence'].idxmin()]
+        max_energy = df.loc[df['arousal'].idxmax()]
+        min_energy = df.loc[df['arousal'].idxmin()]
+        
+        print(f"\nExtreme positions:")
+        print(f"  Most positive mood: {max_positive['valence']:.2f} ({max_positive['quadrant']})")
+        print(f"  Most negative mood: {max_negative['valence']:.2f} ({max_negative['quadrant']})")
+        print(f"  Highest energy: {max_energy['arousal']:.2f} ({max_energy['quadrant']})")
+        print(f"  Lowest energy: {min_energy['arousal']:.2f} ({min_energy['quadrant']})")
+    
     def clear_data(self):
         """Clear stored emotion data"""
         self.emotion_data = []

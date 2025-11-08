@@ -84,10 +84,11 @@ def main():
         # Ask about visualization options
         print("\nVisualization options:")
         print("1. Line plots (technical)")
-        print("2. Heatmaps (technical)")
-        print("3. Easy-to-read report (for everyone)")
-        print("4. All visualizations")
-        viz_choice = input("Choose visualization (1/2/3/4): ").strip() or "3"
+        print("2. Technical heatmaps")
+        print("3. Circle movement heatmap")
+        print("4. Easy-to-read report (for everyone)")
+        print("5. All visualizations")
+        viz_choice = input("Choose visualization (1/2/3/4/5): ").strip() or "4"
         
         # Ask about saving results
         save_results = input("\nSave results? (y/n): ").lower().startswith('y')
@@ -99,29 +100,37 @@ def main():
             print(f"Data saved to {csv_filename}")
             
             # Generate and save visualizations
-            if viz_choice in ["1", "4"]:
+            if viz_choice in ["1", "5"]:
                 plot_filename = f"{output_prefix}_emotions.png"
                 bot.plot_emotions(save_path=plot_filename)
                 print(f"Technical line plot saved to {plot_filename}")
             
-            if viz_choice in ["2", "4"]:
+            if viz_choice in ["2", "5"]:
                 heatmap_filename = f"{output_prefix}_heatmap.png"
                 bot.plot_heatmap(save_path=heatmap_filename)
                 print(f"Technical heatmap saved to {heatmap_filename}")
             
-            if viz_choice in ["3", "4"]:
+            if viz_choice in ["3", "5"]:
+                movement_filename = f"{output_prefix}_movement_heatmap.png"
+                bot.plot_circle_movement_heatmap(save_path=movement_filename)
+                print(f"Circle movement heatmap saved to {movement_filename}")
+            
+            if viz_choice in ["4", "5"]:
                 report_filename = f"{output_prefix}_report.png"
                 bot.generate_layperson_report(save_path=report_filename)
                 print(f"Easy-to-read report saved to {report_filename}")
         else:
             # Just show the plots
-            if viz_choice in ["1", "4"]:
+            if viz_choice in ["1", "5"]:
                 bot.plot_emotions()
             
-            if viz_choice in ["2", "4"]:
+            if viz_choice in ["2", "5"]:
                 bot.plot_heatmap()
             
-            if viz_choice in ["3", "4"]:
+            if viz_choice in ["3", "5"]:
+                bot.plot_circle_movement_heatmap()
+            
+            if viz_choice in ["4", "5"]:
                 bot.generate_layperson_report()
         
     else:
