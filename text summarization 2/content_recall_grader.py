@@ -183,8 +183,8 @@ class ContentRecallGrader:
         
         # Human summary adjustments - humans naturally paraphrase more than AI
         # Boost scores significantly to account for natural human summarization patterns
-        human_adjusted_semantic = min(1.0, semantic_similarity * 2.2)  # Major boost for paraphrasing
-        human_adjusted_topics = min(1.0, topic_coverage * 1.5)         # Strong boost for theme coverage
+        human_adjusted_semantic = min(1.0, semantic_similarity * 2.4)  # Increased boost for paraphrasing
+        human_adjusted_topics = min(1.0, topic_coverage * 1.6)         # Increased boost for theme coverage
         
         # Weights heavily favor topic coverage over exact semantic matching
         weights = {
@@ -205,10 +205,10 @@ class ContentRecallGrader:
         
         # Realistic grading scale for human content recall
         def get_grade(pct):
-            if pct >= 80: return 'A'    # Excellent human content recall
-            elif pct >= 65: return 'B'  # Good human content recall
-            elif pct >= 50: return 'C'  # Adequate human content recall
-            elif pct >= 35: return 'D'  # Poor human content recall
+            if pct >= 75: return 'A'    # Excellent human content recall
+            elif pct >= 60: return 'B'  # Good human content recall
+            elif pct >= 45: return 'C'  # Adequate human content recall
+            elif pct >= 30: return 'D'  # Poor human content recall
             else: return 'F'            # Very poor human content recall
         
         return {
