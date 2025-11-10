@@ -1,0 +1,94 @@
+Facial Data (Emotional Signals)
+- Basic Emotions (7): Angry, Disgust, Fear, Happy, Sad, Surprise, Neutral
+- Emotion Intensity (per frame/second)
+- Emotional Valence (positive vs negative affect)
+- Arousal Level (activation/energy)
+- Emotion Stability/Volatility (standard deviation over time)
+- Dominant Emotion (most frequent)
+- Emotional Transitions (changes between emotions)
+- Facial Expression Intensity Heatmap (temporal patterns)
+- Excitement vs Calmness Balance
+- Positivity vs Negativity Ratio
+- Emotional Quadrant Distribution (arousal-valence space)
+
+Voice Data (Vocal Tone & Prosody)
+- Voice Emotions (7): Angry, Disgust, Fear, Happy, Sad, Surprise, Neutral
+  * All 7 emotions now displayed in comprehensive reports (matching facial system)
+  * Emotions derived from acoustic features using rule-based classification
+- Emotion Intensity (per audio segment)
+- Voice Arousal (activation/energy in speech)
+- Voice Valence (positive/negative tone)
+- Voice Stress Level (pitch variation + harmonic ratio indicators)
+- Dominant Voice Emotion (most frequent)
+- Emotion Distribution (average probability across session)
+- Pitch Mean (Hz) - average fundamental frequency
+- Pitch Variation (Std Dev) - vocal stability indicator
+- Pitch Range - difference between highest and lowest pitch
+- Volume Mean (dB) - speaking loudness
+- Volume Variation (Std Dev) - intensity consistency
+- Volume Range - dynamic range of speech
+- Spectral Centroid - brightness/timbre of voice (Hz)
+- Spectral Bandwidth - frequency spread
+- Spectral Rolloff - frequency distribution (85th percentile)
+- Zero Crossing Rate - noisiness/voicing characteristic
+- Speaking Rate (syllables or words per minute)
+- Silence Ratio - proportion of non-speech segments
+- Voice Tremor - vocal instability/shakiness
+- Harmonic-to-Noise Ratio - voice quality indicator
+- MFCC Coefficients (13 features) - voice quality signature/fingerprint
+- Prosody Features (intonation patterns):
+  * Energy variations
+  * Intensity patterns
+  * Jitter (pitch perturbation)
+  * Shimmer (amplitude perturbation)
+- Pause Duration and Frequency
+
+Linguistic/Verbal Data (Text Analysis)
+- Conversation Transcript (full text from ChatGPT records)
+- Word Count and Speaking Time
+- Politeness Markers (per minute): "please", "thank you", "I understand"
+- Validation Words: "I see", "that makes sense", "interesting point"
+- Confrontational Language: "no", "wrong", "disagree", "but"
+- Question Frequency (genuine inquiry vs rhetorical)
+- Perspective-Taking Language: "from your view", "you believe", "your position"
+- Cognitive Processing Words: "think", "consider", "understand", "analyze"
+- Emotional Words: positive vs negative sentiment
+- First-Person vs Second-Person Pronouns (self-focus vs other-focus)
+- Sentence Complexity and Length
+- Interruption Patterns (if applicable)
+
+Summary Accuracy Data (DV - Listening Index)
+- Summary Completeness Score (% of main points captured)
+- Summary Accuracy Score (correctness of restated stance)
+- Mischaracterization Count (errors or distortions)
+- Key Argument Recall (number of ChatGPT arguments remembered)
+- Stance Identification (correct/incorrect)
+- Evidence Recall (specific facts or data mentioned by ChatGPT)
+
+Independent Variables (Experimental Conditions)
+- ChatGPT Stance: Pro, Anti, Neutral
+- ChatGPT Tone: Friendly, Neutral, Confrontational
+- Topic Category: Politics, Religion, LGBT Rights, Social Issues
+- Pre-loaded Data/Facts (content given to ChatGPT)
+- Conversation Length (in minutes)
+
+Control Variables
+- Participant Demographics: Age, Gender, Political Leaning
+- Prior Familiarity with Topic
+- Time of Day (fatigue effects)
+- Pre-Session Mood (baseline emotional state)
+- AI Interaction Experience
+- Debate/Discussion Experience
+- Recording Quality (lighting, audio clarity)
+
+Derived/Composite Metrics (For Analysis)
+- Constructive Listening Index (combined score):
+  * Summary accuracy (40%)
+  * Emotion stability (20%)
+  * Vocal tone consistency (20%)
+  * Validation words per minute (20%)
+- Empathy Score (facial + vocal + linguistic features)
+- Emotional Regulation Index (volatility inverse)
+- Engagement Level (combination of attention markers)
+- Defensiveness Score (confrontational language + negative emotions)
+- Openness Score (questions + validation + perspective-taking) 

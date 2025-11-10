@@ -12,7 +12,8 @@ class ComprehensiveVoiceReport:
     """Generate detailed reports showing ALL voice emotion data"""
     
     def __init__(self):
-        self.voice_emotions = ['angry', 'happy', 'sad', 'neutral']
+        # Updated to match all 7 facial emotions
+        self.voice_emotions = ['angry', 'disgust', 'fear', 'happy', 'sad', 'surprise', 'neutral']
         self.acoustic_features = ['pitch_mean', 'pitch_std', 'volume_mean', 'volume_std', 
                                  'spectral_centroid', 'spectral_rolloff', 'zero_crossing_rate']
         self.mfcc_features = [f'mfcc_{i}' for i in range(1, 14)]  # MFCCs 1-13
@@ -44,18 +45,21 @@ class ComprehensiveVoiceReport:
         
         # ============ ROW 1: Voice Emotions ============
         
-        # Plot 1: All voice emotions over time
+        # Plot 1: All voice emotions over time (now 7 emotions)
         ax1 = fig.add_subplot(gs[0, :2])
-        colors = ['#FF4444', '#44FF44', '#4444FF', '#888888']
-        for emotion, color in zip(self.voice_emotions, colors):
+        # Updated colors for 7 emotions matching facial system
+        colors = ['#E74C3C', '#8B4513', '#9370DB', '#2ECC71', '#3498DB', '#FFD700', '#95A5A6']
+        emotion_labels = ['Angry', 'Disgust', 'Fear', 'Happy', 'Sad', 'Surprise', 'Neutral']
+        
+        for emotion, color, label in zip(self.voice_emotions, colors, emotion_labels):
             col_name = f'{prefix}{emotion}'
             if col_name in df.columns:
-                ax1.plot(time_data, df[col_name], label=emotion.capitalize(), 
-                        color=color, linewidth=2.5, alpha=0.8)
-        ax1.set_title('🗣️ Voice Emotions Over Time', fontsize=14, fontweight='bold')
+                ax1.plot(time_data, df[col_name], label=label, 
+                        color=color, linewidth=2.0, alpha=0.8)
+        ax1.set_title('🗣️ Voice Emotions Over Time (All 7)', fontsize=14, fontweight='bold')
         ax1.set_xlabel('Time (seconds)')
         ax1.set_ylabel('Emotion Probability (0-1)')
-        ax1.legend(loc='upper right')
+        ax1.legend(loc='upper right', ncol=2, fontsize=9)
         ax1.grid(True, alpha=0.3)
         ax1.set_ylim(-0.05, 1.05)
         
@@ -198,7 +202,7 @@ class ComprehensiveVoiceReport:
             ax11.set_title('🎨 MFCC Coefficients Heatmap (Audio Fingerprint)', fontsize=14, fontweight='bold')
             plt.colorbar(im, ax=ax11, label='Coefficient Value')
         
-        # Plot 12: Voice emotion distribution
+        # Plot 12: Voice emotion distribution (updated for 7 emotions)
         ax12 = fig.add_subplot(gs[3, 3])
         emotion_avgs = {}
         for emotion in self.voice_emotions:
@@ -207,10 +211,12 @@ class ComprehensiveVoiceReport:
                 emotion_avgs[emotion] = df[col_name].mean()
         
         if emotion_avgs:
-            colors_pie = ['#FF4444', '#44FF44', '#4444FF', '#888888']
+            # Updated colors for 7 emotions
+            colors_pie = ['#E74C3C', '#8B4513', '#9370DB', '#2ECC71', '#3498DB', '#FFD700', '#95A5A6']
             ax12.pie(emotion_avgs.values(), labels=[e.capitalize() for e in emotion_avgs.keys()],
-                    autopct='%1.1f%%', colors=colors_pie[:len(emotion_avgs)], startangle=90)
-            ax12.set_title('🥧 Voice Emotion Distribution', fontsize=13, fontweight='bold')
+                    autopct='%1.1f%%', colors=colors_pie[:len(emotion_avgs)], startangle=90,
+                    textprops={'fontsize': 8})
+            ax12.set_title('🥧 Voice Emotion Distribution (All 7)', fontsize=13, fontweight='bold')
         
         # ============ ROW 5: Statistical Summary ============
         
