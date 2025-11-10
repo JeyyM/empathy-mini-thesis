@@ -178,22 +178,28 @@ class VoiceEmotionBot:
         speech_rate_norm = min(1.0, features['speech_rate'] / 5.0)  # Normalize speech rate
         
         # AROUSAL: High pitch variation + high speech rate + high volume = high arousal
+        # Amplified for better sensitivity to high-energy emotions like anger
         arousal = (0.4 * pitch_var_norm + 0.3 * speech_rate_norm + 0.3 * volume_norm)
-        emotions['voice_arousal'] = (arousal * 2) - 1  # Scale to -1 to 1
+        emotions['voice_arousal'] = np.clip((arousal * 2.5) - 1.2, -1, 1)  # Stronger scaling for high arousal
         
         # VALENCE: Higher spectral centroid + moderate pitch = positive valence
+        # For angry voices: harsh spectral characteristics = negative valence
         spectral_norm = min(1.0, features['spectral_centroid'] / 5000.0)
-        valence_raw = (0.5 * spectral_norm + 0.3 * (1 - features['silence_ratio']) + 
-                      0.2 * features['harmonic_ratio'])
-        emotions['voice_valence'] = (valence_raw * 2) - 1  # Scale to -1 to 1
+        pitch_harshness = min(1.0, features['pitch_variation'] / 100.0)  # High variation = harsh/negative
+        
+        # Negative valence boosted by harsh spectral features and low harmonic ratio
+        valence_raw = (0.4 * spectral_norm + 0.2 * (1 - features['silence_ratio']) + 
+                      0.2 * features['harmonic_ratio'] - 0.2 * pitch_harshness)
+        emotions['voice_valence'] = np.clip((valence_raw * 2) - 1, -1, 1)
         
         # INTENSITY: Overall voice energy and variation
         intensity = (0.4 * volume_norm + 0.3 * pitch_var_norm + 0.3 * (1 - features['silence_ratio']))
         emotions['voice_intensity'] = intensity
         
         # STRESS: High pitch + high variation + low harmonic ratio = stress
+        # Boosted sensitivity for angry/stressed voices
         stress = (0.3 * pitch_norm + 0.4 * pitch_var_norm + 0.3 * (1 - features['harmonic_ratio']))
-        emotions['voice_stress'] = stress
+        emotions['voice_stress'] = min(1.0, stress * 1.3)  # Amplify stress detection
         
         # BASIC EMOTIONS (rule-based classification)
         # Happy: High valence + moderate arousal + high harmonic ratio
@@ -201,23 +207,27 @@ class VoiceEmotionBot:
                                      (arousal + 0.5) * features['harmonic_ratio'])
         
         # Angry: High arousal + negative valence + high volume + high pitch variation
-        emotions['voice_angry'] = max(0, arousal * max(0, -emotions['voice_valence']) * volume_norm * pitch_var_norm)
+        # Strengthened formula for better anger detection
+        angry_score = (arousal ** 1.5) * max(0, -emotions['voice_valence'] + 0.2) * volume_norm * (pitch_var_norm ** 0.8)
+        emotions['voice_angry'] = min(1.0, angry_score * 1.5)  # Amplified anger detection
         
         # Sad: Low arousal + negative valence + low volume + high silence ratio
         emotions['voice_sad'] = max(0, (1 - arousal) * max(0, -emotions['voice_valence']) * 
                                    (1 - volume_norm) * features['silence_ratio'])
         
         # Fear: High arousal + negative valence + high voice tremor + high stress
-        emotions['voice_fear'] = max(0, arousal * max(0, -emotions['voice_valence']) * 
-                                    min(1.0, features['voice_tremor'] / 50.0) * stress)
+        # Strengthened for better fear detection
+        fear_score = (arousal ** 1.2) * max(0, -emotions['voice_valence'] + 0.1) * min(1.0, features['voice_tremor'] / 40.0) * stress
+        emotions['voice_fear'] = min(1.0, fear_score * 1.3)
         
         # Surprise: Very high arousal + neutral valence + high pitch variation
         emotions['voice_surprise'] = max(0, min(1.0, arousal * 1.5) * 
                                         (1 - abs(emotions['voice_valence'])) * pitch_var_norm)
         
         # Disgust: Moderate arousal + negative valence + low harmonic ratio
-        emotions['voice_disgust'] = max(0, (arousal * 0.7) * max(0, -emotions['voice_valence']) * 
-                                       (1 - features['harmonic_ratio']))
+        # Strengthened to push more into stressed quadrant
+        disgust_score = (arousal * 0.8) * max(0, -emotions['voice_valence'] + 0.15) * (1 - features['harmonic_ratio'])
+        emotions['voice_disgust'] = min(1.0, disgust_score * 1.2)
         
         # Neutral: Low arousal + neutral valence + stable features
         emotions['voice_neutral'] = max(0, (1 - arousal) * (1 - abs(emotions['voice_valence'])) * 
