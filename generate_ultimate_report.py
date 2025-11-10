@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.gridspec import GridSpec
 import seaborn as sns
+import os
 
 class UltimateReportGenerator:
     """
