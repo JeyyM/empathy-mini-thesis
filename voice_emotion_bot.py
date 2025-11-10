@@ -383,6 +383,90 @@ class VoiceEmotionBot:
         
         plt.show()
     
+    def plot_voice_heatmap(self, save_path=None, bins=20):
+        """
+        Plot voice emotion distribution heatmaps similar to facial heatmap
+        Shows arousal-valence space, intensity distribution, and emotion patterns
+        """
+        if not self.voice_data:
+            print("No voice data to plot")
+            return
+        
+        df = pd.DataFrame(self.voice_data)
+        
+        # Create figure with subplots
+        fig, axes = plt.subplots(2, 2, figsize=(15, 12))
+        fig.suptitle('Voice Emotion Distribution Heatmaps', fontsize=16, fontweight='bold')
+        
+        # 1. Arousal-Valence density heatmap
+        ax1 = axes[0, 0]
+        arousal_vals = df['voice_arousal'].values
+        valence_vals = df['voice_valence'].values
+        
+        h1 = ax1.hist2d(valence_vals, arousal_vals, bins=bins, cmap='YlOrRd', alpha=0.8)
+        ax1.set_xlabel('Valence (Negative ← → Positive)')
+        ax1.set_ylabel('Arousal (Calm ← → Exciting)')
+        ax1.set_title('Voice Arousal-Valence Density')
+        ax1.grid(True, alpha=0.3)
+        ax1.axhline(y=0, color='black', linestyle='--', alpha=0.5)
+        ax1.axvline(x=0, color='black', linestyle='--', alpha=0.5)
+        
+        # Add quadrant labels
+        ax1.text(0.6, 0.6, 'Excited\n(Happy)', ha='center', va='center', fontsize=10, fontweight='bold')
+        ax1.text(-0.6, 0.6, 'Agitated\n(Angry/Fear)', ha='center', va='center', fontsize=10, fontweight='bold')
+        ax1.text(0.6, -0.6, 'Calm\n(Neutral)', ha='center', va='center', fontsize=10, fontweight='bold')
+        ax1.text(-0.6, -0.6, 'Depressed\n(Sad)', ha='center', va='center', fontsize=10, fontweight='bold')
+        
+        plt.colorbar(h1[3], ax=ax1, label='Frequency')
+        
+        # 2. Intensity heatmap
+        ax2 = axes[0, 1]
+        intensity_vals = df['voice_intensity'].values
+        h2 = ax2.hist2d(valence_vals, arousal_vals, bins=bins, weights=intensity_vals, cmap='plasma', alpha=0.8)
+        ax2.set_xlabel('Valence (Negative ← → Positive)')
+        ax2.set_ylabel('Arousal (Calm ← → Exciting)')
+        ax2.set_title('Voice Emotional Intensity Distribution')
+        ax2.grid(True, alpha=0.3)
+        ax2.axhline(y=0, color='white', linestyle='--', alpha=0.7)
+        ax2.axvline(x=0, color='white', linestyle='--', alpha=0.7)
+        plt.colorbar(h2[3], ax=ax2, label='Average Intensity')
+        
+        # 3. Stress level heatmap
+        ax3 = axes[1, 0]
+        stress_vals = df['voice_stress'].values
+        h3 = ax3.hist2d(valence_vals, arousal_vals, bins=bins, weights=stress_vals, cmap='RdYlGn_r', alpha=0.8)
+        ax3.set_xlabel('Valence (Negative ← → Positive)')
+        ax3.set_ylabel('Arousal (Calm ← → Exciting)')
+        ax3.set_title('Voice Stress Level Distribution')
+        ax3.grid(True, alpha=0.3)
+        ax3.axhline(y=0, color='white', linestyle='--', alpha=0.7)
+        ax3.axvline(x=0, color='white', linestyle='--', alpha=0.7)
+        plt.colorbar(h3[3], ax=ax3, label='Average Stress')
+        
+        # 4. Time evolution heatmap (matching facial heatmap)
+        ax4 = axes[1, 1]
+        if 'time_seconds' in df.columns:
+            time_vals = df['time_seconds'].values
+            h4 = ax4.hist2d(time_vals, arousal_vals, bins=bins, cmap='viridis', alpha=0.8)
+            ax4.set_xlabel('Time (seconds)')
+            ax4.set_ylabel('Arousal (Calm ← → Exciting)')
+            ax4.set_title('Voice Arousal Evolution Over Time')
+            ax4.grid(True, alpha=0.3)
+            ax4.axhline(y=0, color='white', linestyle='--', alpha=0.7)
+            plt.colorbar(h4[3], ax=ax4, label='Frequency')
+        else:
+            ax4.text(0.5, 0.5, 'No time data available', ha='center', va='center', 
+                    transform=ax4.transAxes, fontsize=12)
+            ax4.set_title('Time Evolution (No Data)')
+        
+        plt.tight_layout()
+        
+        if save_path:
+            plt.savefig(save_path, dpi=300, bbox_inches='tight')
+            print(f"Voice heatmap saved to: {save_path}")
+        
+        plt.show()
+    
     def save_voice_data(self, filename):
         """Save voice emotion data to CSV"""
         if not self.voice_data:
@@ -392,6 +476,146 @@ class VoiceEmotionBot:
         df = pd.DataFrame(self.voice_data)
         df.to_csv(filename, index=False)
         print(f"Voice emotion data saved to: {filename}")
+    
+    def plot_voice_movement_heatmap(self, save_path=None, grid_size=50):
+        """Create a heatmap showing voice emotion movement patterns within the emotion circle"""
+        if not self.voice_data:
+            print("No voice data available for movement heatmap")
+            return
+        
+        df = pd.DataFrame(self.voice_data)
+        
+        # Create figure
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(16, 8))
+        fig.suptitle('Voice Emotion Circle Movement Analysis', fontsize=16, fontweight='bold')
+        
+        # Extract arousal and valence data
+        arousal_vals = df['voice_arousal'].values
+        valence_vals = df['voice_valence'].values
+        
+        # Create circular grid for heatmap
+        x = np.linspace(-1, 1, grid_size)
+        y = np.linspace(-1, 1, grid_size)
+        X, Y = np.meshgrid(x, y)
+        
+        # Create mask for circular boundary
+        circle_mask = X**2 + Y**2 <= 1
+        
+        # 1. Movement density heatmap (left plot)
+        H, xedges, yedges = np.histogram2d(valence_vals, arousal_vals, bins=grid_size, range=[[-1, 1], [-1, 1]])
+        H = H.T  # Transpose for correct orientation
+        
+        # Apply circular mask
+        H_masked = np.where(circle_mask, H, np.nan)
+        
+        im1 = ax1.imshow(H_masked, extent=[-1, 1, -1, 1], origin='lower', cmap='YlOrRd', alpha=0.8)
+        
+        # Draw circle boundary
+        circle = plt.Circle((0, 0), 1, fill=False, color='black', linewidth=2)
+        ax1.add_patch(circle)
+        
+        # Draw quadrant lines
+        ax1.axhline(y=0, color='black', linestyle='-', alpha=0.5, linewidth=1)
+        ax1.axvline(x=0, color='black', linestyle='-', alpha=0.5, linewidth=1)
+        
+        # Add quadrant labels
+        ax1.text(0.7, 0.7, 'EXCITED\nEnergized', ha='center', va='center', fontsize=10, fontweight='bold', 
+                bbox=dict(boxstyle="round,pad=0.3", facecolor="yellow", alpha=0.7))
+        ax1.text(-0.7, 0.7, 'STRESSED\nAnxious', ha='center', va='center', fontsize=10, fontweight='bold',
+                bbox=dict(boxstyle="round,pad=0.3", facecolor="orange", alpha=0.7))
+        ax1.text(0.7, -0.7, 'PEACEFUL\nRelaxed', ha='center', va='center', fontsize=10, fontweight='bold',
+                bbox=dict(boxstyle="round,pad=0.3", facecolor="lightgreen", alpha=0.7))
+        ax1.text(-0.7, -0.7, 'TIRED\nLow mood', ha='center', va='center', fontsize=10, fontweight='bold',
+                bbox=dict(boxstyle="round,pad=0.3", facecolor="lightblue", alpha=0.7))
+        
+        # Add axis labels
+        ax1.set_xlabel('MOOD: Negative ← → Positive', fontsize=12, fontweight='bold')
+        ax1.set_ylabel('ENERGY: Low ← → High', fontsize=12, fontweight='bold')
+        ax1.set_title('Where Voice Spends Time\n(Movement Density)', fontsize=14, fontweight='bold')
+        
+        # Add colorbar
+        cbar1 = plt.colorbar(im1, ax=ax1, shrink=0.8)
+        cbar1.set_label('Time Spent (frequency)', fontsize=10)
+        
+        # Set equal aspect ratio and limits
+        ax1.set_xlim(-1.1, 1.1)
+        ax1.set_ylim(-1.1, 1.1)
+        ax1.set_aspect('equal')
+        
+        # 2. Movement path with intensity (right plot)
+        # Create a smooth heatmap based on trajectory
+        gaussian_grid = np.zeros((grid_size, grid_size))
+        
+        for i, (val, ar) in enumerate(zip(valence_vals, arousal_vals)):
+            # Convert to grid coordinates
+            x_idx = int((val + 1) * grid_size / 2)
+            y_idx = int((ar + 1) * grid_size / 2)
+            
+            # Ensure indices are within bounds
+            x_idx = max(0, min(grid_size - 1, x_idx))
+            y_idx = max(0, min(grid_size - 1, y_idx))
+            
+            # Add Gaussian blob around the point
+            sigma = 3  # Spread of the Gaussian
+            for dx in range(-sigma*2, sigma*2 + 1):
+                for dy in range(-sigma*2, sigma*2 + 1):
+                    nx, ny = x_idx + dx, y_idx + dy
+                    if 0 <= nx < grid_size and 0 <= ny < grid_size:
+                        # Calculate Gaussian weight
+                        dist = np.sqrt(dx**2 + dy**2)
+                        weight = np.exp(-(dist**2) / (2 * sigma**2))
+                        gaussian_grid[ny, nx] += weight
+        
+        # Apply circular mask
+        gaussian_grid_masked = np.where(circle_mask, gaussian_grid, np.nan)
+        
+        im2 = ax2.imshow(gaussian_grid_masked, extent=[-1, 1, -1, 1], origin='lower', cmap='plasma', alpha=0.8)
+        
+        # Draw circle boundary
+        circle2 = plt.Circle((0, 0), 1, fill=False, color='black', linewidth=2)
+        ax2.add_patch(circle2)
+        
+        # Draw quadrant lines
+        ax2.axhline(y=0, color='white', linestyle='-', alpha=0.5, linewidth=1)
+        ax2.axvline(x=0, color='white', linestyle='-', alpha=0.5, linewidth=1)
+        
+        # Plot trajectory line
+        ax2.plot(valence_vals, arousal_vals, 'w-', alpha=0.3, linewidth=1)
+        ax2.plot(valence_vals[0], arousal_vals[0], 'go', markersize=10, label='Start', markeredgecolor='white')
+        ax2.plot(valence_vals[-1], arousal_vals[-1], 'ro', markersize=10, label='End', markeredgecolor='white')
+        
+        # Add quadrant labels
+        ax2.text(0.7, 0.7, 'EXCITED\nEnergized', ha='center', va='center', fontsize=10, fontweight='bold', 
+                bbox=dict(boxstyle="round,pad=0.3", facecolor="yellow", alpha=0.7))
+        ax2.text(-0.7, 0.7, 'STRESSED\nAnxious', ha='center', va='center', fontsize=10, fontweight='bold',
+                bbox=dict(boxstyle="round,pad=0.3", facecolor="orange", alpha=0.7))
+        ax2.text(0.7, -0.7, 'PEACEFUL\nRelaxed', ha='center', va='center', fontsize=10, fontweight='bold',
+                bbox=dict(boxstyle="round,pad=0.3", facecolor="lightgreen", alpha=0.7))
+        ax2.text(-0.7, -0.7, 'TIRED\nLow mood', ha='center', va='center', fontsize=10, fontweight='bold',
+                bbox=dict(boxstyle="round,pad=0.3", facecolor="lightblue", alpha=0.7))
+        
+        # Add axis labels
+        ax2.set_xlabel('MOOD: Negative ← → Positive', fontsize=12, fontweight='bold')
+        ax2.set_ylabel('ENERGY: Low ← → High', fontsize=12, fontweight='bold')
+        ax2.set_title('Voice Emotional Journey\n(Movement Path)', fontsize=14, fontweight='bold')
+        
+        # Add colorbar
+        cbar2 = plt.colorbar(im2, ax=ax2, shrink=0.8)
+        cbar2.set_label('Path Intensity', fontsize=10)
+        
+        # Set equal aspect ratio and limits
+        ax2.set_xlim(-1.1, 1.1)
+        ax2.set_ylim(-1.1, 1.1)
+        ax2.set_aspect('equal')
+        ax2.legend(loc='upper left', fontsize=10)
+        
+        plt.tight_layout()
+        
+        if save_path:
+            plt.savefig(save_path, dpi=300, bbox_inches='tight')
+            print(f"Voice movement heatmap saved to: {save_path}")
+        
+        plt.show()
 
 def main():
     """Example usage of Voice Emotion Bot"""

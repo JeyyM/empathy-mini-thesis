@@ -154,14 +154,16 @@ def main():
         if has_voice_data:
             print("1. Unified analysis (facial + voice combined)")
             print("2. Facial emotions line plot")
-            print("3. Voice features only")
+            print("3. Voice features line plot")
             print("4. Facial emotion heatmap")
-            print("5. Circle movement heatmap")
-            print("6. Easy-to-read report (for everyone)")
-            print("7. All standard visualizations (1-6)")
-            print("8. 🌟 Comprehensive reports (ALL data - facial & voice separate)")
-            print("9. 🔥 EVERYTHING (all standard + comprehensive)")
-            viz_choice = input("Choose visualization (1-9): ").strip() or "1"
+            print("5. Voice emotion heatmap")
+            print("6. Facial movement heatmap (circle)")
+            print("7. Voice movement heatmap (circle)")
+            print("8. Easy-to-read report (for everyone)")
+            print("9. All standard visualizations (1-8)")
+            print("10. 🌟 Comprehensive reports (ALL data - facial & voice separate)")
+            print("11. 🔥 EVERYTHING (all standard + comprehensive)")
+            viz_choice = input("Choose visualization (1-11): ").strip() or "1"
         else:
             print("1. Line plots (technical)")
             print("2. Technical heatmaps")
@@ -183,7 +185,7 @@ def main():
             # Generate and save visualizations
             if has_voice_data:
                 # Unified (facial + voice) visualizations
-                if viz_choice in ["1", "7", "9"]:
+                if viz_choice in ["1", "9", "11"]:
                     unified_filename = f"{output_prefix}_unified_emotions.png"
                     # Use appropriate tracker
                     if user_input.lower() == "camera":
@@ -218,7 +220,7 @@ def main():
                         tracker.plot_unified_emotions(save_path=unified_filename)
                     print(f"✅ Unified analysis saved to {unified_filename}")
                 
-                if viz_choice in ["2", "7", "9"]:
+                if viz_choice in ["2", "9", "11"]:
                     plot_filename = f"{output_prefix}_facial_emotions.png"
                     bot.emotion_data = [{
                         'timestamp': row.get('timestamp'),
@@ -241,7 +243,7 @@ def main():
                     bot.plot_emotions(save_path=plot_filename)
                     print(f"✅ Facial emotions saved to {plot_filename}")
                 
-                if viz_choice in ["3", "7", "9"]:
+                if viz_choice in ["3", "9", "11"]:
                     voice_filename = f"{output_prefix}_voice_features.png"
                     # Use voice bot to plot voice features
                     if user_input.lower() == "camera":
@@ -252,7 +254,7 @@ def main():
                         tracker.voice_bot.plot_voice_emotions(save_path=voice_filename)
                     print(f"✅ Voice features saved to {voice_filename}")
                 
-                if viz_choice in ["4", "7", "9"]:
+                if viz_choice in ["4", "9", "11"]:
                     heatmap_filename = f"{output_prefix}_facial_heatmap.png"
                     bot.emotion_data = [{
                         'timestamp': row.get('timestamp'),
@@ -271,7 +273,18 @@ def main():
                     bot.plot_heatmap(save_path=heatmap_filename)
                     print(f"✅ Facial heatmap saved to {heatmap_filename}")
                 
-                if viz_choice in ["5", "7", "9"]:
+                if viz_choice in ["5", "9", "11"]:
+                    voice_heatmap_filename = f"{output_prefix}_voice_heatmap.png"
+                    # Use voice bot to plot voice heatmap
+                    if user_input.lower() == "camera":
+                        # For camera mode, use the live tracker's voice bot
+                        live_tracker.voice_bot.plot_voice_heatmap(save_path=voice_heatmap_filename)
+                    else:
+                        # For video mode, use the tracker's voice bot
+                        tracker.voice_bot.plot_voice_heatmap(save_path=voice_heatmap_filename)
+                    print(f"✅ Voice heatmap saved to {voice_heatmap_filename}")
+                
+                if viz_choice in ["6", "9", "11"]:
                     movement_filename = f"{output_prefix}_movement_heatmap.png"
                     # Populate bot.emotion_data for camera mode
                     if user_input.lower() == "camera":
@@ -291,7 +304,18 @@ def main():
                     bot.plot_circle_movement_heatmap(save_path=movement_filename)
                     print(f"✅ Circle movement heatmap saved to {movement_filename}")
                 
-                if viz_choice in ["6", "7", "9"]:
+                if viz_choice in ["7", "9", "11"]:
+                    voice_movement_filename = f"{output_prefix}_voice_movement_heatmap.png"
+                    # Use voice bot to plot voice movement heatmap
+                    if user_input.lower() == "camera":
+                        # For camera mode, use the live tracker's voice bot
+                        live_tracker.voice_bot.plot_voice_movement_heatmap(save_path=voice_movement_filename)
+                    else:
+                        # For video mode, use the tracker's voice bot
+                        tracker.voice_bot.plot_voice_movement_heatmap(save_path=voice_movement_filename)
+                    print(f"✅ Voice movement heatmap saved to {voice_movement_filename}")
+                
+                if viz_choice in ["8", "9", "11"]:
                     report_filename = f"{output_prefix}_report.png"
                     # Populate bot.emotion_data for camera mode
                     if user_input.lower() == "camera":
@@ -312,7 +336,7 @@ def main():
                     print(f"✅ Easy-to-read report saved to {report_filename}")
                 
                 # NEW: Comprehensive reports option (with voice data)
-                if viz_choice in ["8", "9"]:
+                if viz_choice in ["10", "11"]:
                     print("\n🌟 Generating comprehensive reports with ALL data...")
                     from generate_facial_report import ComprehensiveFacialReport
                     from generate_comprehensive_voice_report import ComprehensiveVoiceReport
@@ -367,20 +391,30 @@ def main():
         else:
             # Just show the plots (not saving)
             if has_voice_data:
-                if viz_choice in ["1", "7", "9"]:
+                if viz_choice in ["1", "9", "11"]:
                     tracker.plot_unified_emotions()
-                if viz_choice in ["2", "7", "9"]:
+                if viz_choice in ["2", "9", "11"]:
                     bot.plot_emotions()
-                if viz_choice in ["3", "7", "9"]:
+                if viz_choice in ["3", "9", "11"]:
                     if user_input.lower() == "camera":
                         live_tracker.voice_bot.plot_voice_emotions()
                     else:
                         tracker.voice_bot.plot_voice_emotions()
-                if viz_choice in ["4", "7", "9"]:
+                if viz_choice in ["4", "9", "11"]:
                     bot.plot_heatmap()
-                if viz_choice in ["5", "7", "9"]:
+                if viz_choice in ["5", "9", "11"]:
+                    if user_input.lower() == "camera":
+                        live_tracker.voice_bot.plot_voice_heatmap()
+                    else:
+                        tracker.voice_bot.plot_voice_heatmap()
+                if viz_choice in ["6", "9", "11"]:
                     bot.plot_circle_movement_heatmap()
-                if viz_choice in ["6", "7", "9"]:
+                if viz_choice in ["7", "9", "11"]:
+                    if user_input.lower() == "camera":
+                        live_tracker.voice_bot.plot_voice_movement_heatmap()
+                    else:
+                        tracker.voice_bot.plot_voice_movement_heatmap()
+                if viz_choice in ["8", "9", "11"]:
                     bot.generate_layperson_report()
             else:
                 if viz_choice in ["1", "5"]:
@@ -404,3 +438,4 @@ if __name__ == "__main__":
     main()
 
 #
+
