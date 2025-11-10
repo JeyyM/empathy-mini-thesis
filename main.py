@@ -163,7 +163,8 @@ def main():
             print("9. All standard visualizations (1-8)")
             print("10. 🌟 Comprehensive reports (ALL data - facial & voice separate)")
             print("11. 🔥 EVERYTHING (all standard + comprehensive)")
-            viz_choice = input("Choose visualization (1-11): ").strip() or "1"
+            print("12. 🚀 ULTIMATE MEGA REPORT (single massive 24-subplot analysis)")
+            viz_choice = input("Choose visualization (1-12): ").strip() or "1"
         else:
             print("1. Line plots (technical)")
             print("2. Technical heatmaps")
@@ -336,7 +337,7 @@ def main():
                     print(f"✅ Easy-to-read report saved to {report_filename}")
                 
                 # NEW: Comprehensive reports option (with voice data)
-                if viz_choice in ["10", "11"]:
+                if viz_choice in ["10", "11", "12"]:
                     print("\n🌟 Generating comprehensive reports with ALL data...")
                     from generate_facial_report import ComprehensiveFacialReport
                     from generate_comprehensive_voice_report import ComprehensiveVoiceReport
@@ -354,6 +355,19 @@ def main():
                     print(f"\n✅ Comprehensive reports complete!")
                     print(f"   📄 Facial: {facial_comp_filename}")
                     print(f"   📄 Voice: {voice_comp_filename}")
+                
+                # ULTIMATE MEGA REPORT
+                if viz_choice == "12":
+                    print("\n🚀 Generating ULTIMATE MEGA REPORT (24+ subplots)...")
+                    from generate_ultimate_report import UltimateReportGenerator
+                    
+                    ultimate_generator = UltimateReportGenerator()
+                    ultimate_filename = f"{output_prefix}_ULTIMATE_MEGA_REPORT.png"
+                    ultimate_generator.generate_mega_report(df, save_path=ultimate_filename)
+                    
+                    print(f"\n✅ ULTIMATE MEGA REPORT COMPLETE!")
+                    print(f"   📄 {ultimate_filename}")
+                    print(f"   This single file contains EVERYTHING - all visualizations combined!")
                     
             else:
                 # Facial-only visualizations (webcam mode)
