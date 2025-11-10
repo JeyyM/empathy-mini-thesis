@@ -1,0 +1,2 @@
+# Additional requirements for live microphone recording
+pyaudio>=0.2.13

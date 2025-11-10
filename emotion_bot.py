@@ -803,6 +803,19 @@ class EmotionBot:
         
         df = self.get_dataframe()
         
+        # Determine column naming convention
+        if 'arousal' in df.columns:
+            arousal_col = 'arousal'
+            valence_col = 'valence'
+            quadrant_col = 'quadrant'
+        elif 'facial_arousal' in df.columns:
+            arousal_col = 'facial_arousal'
+            valence_col = 'facial_valence'
+            quadrant_col = 'facial_quadrant'
+        else:
+            print("⚠️ No arousal/valence data found in dataframe")
+            return
+        
         # Create a clean, simple report figure
         fig = plt.figure(figsize=(16, 10))
         gs = fig.add_gridspec(3, 3, hspace=0.3, wspace=0.3)
@@ -830,14 +843,14 @@ class EmotionBot:
         ax2 = fig.add_subplot(gs[0, 1])
         time_data = np.arange(len(df))
         energy_levels = ['Very Low' if x < -0.5 else 'Low' if x < -0.2 else 'Medium' if x < 0.3 else 'High' if x < 0.6 else 'Very High' 
-                        for x in df['arousal']]
+                        for x in df[arousal_col]]
         energy_colors = {'Very Low': '#4169E1', 'Low': '#87CEEB', 'Medium': '#FFFF00', 'High': '#FFA500', 'Very High': '#FF4500'}
         
         for i, (level, color) in enumerate(energy_colors.items()):
             mask = [x == level for x in energy_levels]
             if any(mask):
                 ax2.scatter([j for j, m in enumerate(mask) if m], 
-                           [df['arousal'].iloc[j] for j, m in enumerate(mask) if m], 
+                           [df[arousal_col].iloc[j] for j, m in enumerate(mask) if m], 
                            c=color, label=level, s=30, alpha=0.7)
         
         ax2.set_xlabel('Time →')
@@ -849,14 +862,14 @@ class EmotionBot:
         # 3. Mood levels over time (top right)
         ax3 = fig.add_subplot(gs[0, 2])
         mood_levels = ['Very Negative' if x < -0.5 else 'Negative' if x < -0.2 else 'Neutral' if x < 0.2 else 'Positive' if x < 0.5 else 'Very Positive' 
-                      for x in df['valence']]
+                      for x in df[valence_col]]
         mood_colors = {'Very Negative': '#8B0000', 'Negative': '#CD5C5C', 'Neutral': '#D3D3D3', 'Positive': '#90EE90', 'Very Positive': '#00FF00'}
         
         for level, color in mood_colors.items():
             mask = [x == level for x in mood_levels]
             if any(mask):
                 ax3.scatter([j for j, m in enumerate(mask) if m], 
-                           [df['valence'].iloc[j] for j, m in enumerate(mask) if m], 
+                           [df[valence_col].iloc[j] for j, m in enumerate(mask) if m], 
                            c=color, label=level, s=30, alpha=0.7)
         
         ax3.set_xlabel('Time →')
@@ -867,7 +880,7 @@ class EmotionBot:
         
         # 4. Emotional states distribution (middle row, full width)
         ax4 = fig.add_subplot(gs[1, :])
-        quadrant_counts = df['quadrant'].value_counts()
+        quadrant_counts = df[quadrant_col].value_counts()
         quadrant_colors = {'Excited': '#FFD700', 'Agitated': '#FF6347', 'Calm': '#90EE90', 'Depressed': '#87CEEB'}
         
         bars = ax4.bar(quadrant_counts.index, quadrant_counts.values, 
@@ -888,8 +901,8 @@ class EmotionBot:
         
         # Calculate insights
         dominant_emotion = max(main_emotions, key=main_emotions.get)
-        avg_energy = df['arousal'].mean()
-        avg_mood = df['valence'].mean()
+        avg_energy = df[arousal_col].mean()
+        avg_mood = df[valence_col].mean()
         most_common_state = quadrant_counts.index[0]
         
         energy_desc = "high" if avg_energy > 0.2 else "low" if avg_energy < -0.2 else "moderate"
@@ -939,7 +952,7 @@ and a generally {mood_desc} mood."""
         # 7. Emotion timeline (bottom right)
         ax7 = fig.add_subplot(gs[2, 2])
         # Simple timeline showing emotional journey
-        timeline_colors = [quadrant_colors.get(q, '#D3D3D3') for q in df['quadrant']]
+        timeline_colors = [quadrant_colors.get(q, '#D3D3D3') for q in df[quadrant_col]]
         ax7.scatter(range(len(df)), [0]*len(df), c=timeline_colors, s=50, alpha=0.7)
         ax7.set_xlim(-1, len(df))
         ax7.set_ylim(-0.5, 0.5)
@@ -973,9 +986,22 @@ and a generally {mood_desc} mood."""
         fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(16, 8))
         fig.suptitle('Emotion Circle Movement Analysis', fontsize=16, fontweight='bold')
         
-        # Extract arousal and valence data
-        arousal_vals = df['arousal'].values
-        valence_vals = df['valence'].values
+        # Extract arousal and valence data (handle both naming conventions)
+        if 'arousal' in df.columns:
+            arousal_col = 'arousal'
+            valence_col = 'valence'
+            quadrant_col = 'quadrant'
+            arousal_vals = df['arousal'].values
+            valence_vals = df['valence'].values
+        elif 'facial_arousal' in df.columns:
+            arousal_col = 'facial_arousal'
+            valence_col = 'facial_valence'
+            quadrant_col = 'facial_quadrant'
+            arousal_vals = df['facial_arousal'].values
+            valence_vals = df['facial_valence'].values
+        else:
+            print("⚠️ No arousal/valence data found in dataframe")
+            return
         
         # Create circular grid for heatmap
         x = np.linspace(-1, 1, grid_size)
@@ -1110,23 +1136,24 @@ and a generally {mood_desc} mood."""
             print(f"Movement activity: {'High' if avg_distance > 0.1 else 'Moderate' if avg_distance > 0.05 else 'Low'}")
         
         # Quadrant time analysis
-        quadrant_time = df['quadrant'].value_counts()
-        print(f"\nTime in each emotional state:")
-        for quadrant, count in quadrant_time.items():
-            percentage = (count / len(df)) * 100
-            print(f"  {quadrant}: {count} moments ({percentage:.1f}%)")
+        if quadrant_col in df.columns:
+            quadrant_time = df[quadrant_col].value_counts()
+            print(f"\nTime in each emotional state:")
+            for quadrant, count in quadrant_time.items():
+                percentage = (count / len(df)) * 100
+                print(f"  {quadrant}: {count} moments ({percentage:.1f}%)")
         
         # Most extreme positions
-        max_positive = df.loc[df['valence'].idxmax()]
-        max_negative = df.loc[df['valence'].idxmin()]
-        max_energy = df.loc[df['arousal'].idxmax()]
-        min_energy = df.loc[df['arousal'].idxmin()]
+        max_positive = df.loc[df[valence_col].idxmax()]
+        max_negative = df.loc[df[valence_col].idxmin()]
+        max_energy = df.loc[df[arousal_col].idxmax()]
+        min_energy = df.loc[df[arousal_col].idxmin()]
         
         print(f"\nExtreme positions:")
-        print(f"  Most positive mood: {max_positive['valence']:.2f} ({max_positive['quadrant']})")
-        print(f"  Most negative mood: {max_negative['valence']:.2f} ({max_negative['quadrant']})")
-        print(f"  Highest energy: {max_energy['arousal']:.2f} ({max_energy['quadrant']})")
-        print(f"  Lowest energy: {min_energy['arousal']:.2f} ({min_energy['quadrant']})")
+        print(f"  Most positive mood: {max_positive[valence_col]:.2f} ({max_positive.get(quadrant_col, 'Unknown')})")
+        print(f"  Most negative mood: {max_negative[valence_col]:.2f} ({max_negative.get(quadrant_col, 'Unknown')})")
+        print(f"  Highest energy: {max_energy[arousal_col]:.2f} ({max_energy.get(quadrant_col, 'Unknown')})")
+        print(f"  Lowest energy: {min_energy[arousal_col]:.2f} ({min_energy.get(quadrant_col, 'Unknown')})")
     
     def clear_data(self):
         """Clear stored emotion data"""

@@ -28,9 +28,9 @@ class UnifiedEmotionTracker:
         self.sample_rate = sample_rate
         self.synchronized_data = []
         
-        print("✅ Facial emotion detector ready")
-        print("✅ Voice emotion detector ready")
-        print("✅ Unified tracker initialized")
+        print("[OK] Facial emotion detector ready")
+        print("[OK] Voice emotion detector ready")
+        print("[OK] Unified tracker initialized")
     
     def extract_audio_from_video(self, video_path, temp_audio_path="temp_audio.wav"):
         """Extract audio from video file for voice analysis"""
@@ -60,7 +60,7 @@ class UnifiedEmotionTracker:
             audio_clip.close()
             video_clip.close()
             
-            print(f"✅ Audio extracted: {video_duration:.2f} seconds")
+            print(f"[OK] Audio extracted: {video_duration:.2f} seconds")
             return temp_audio_path, video_duration
             
         except Exception as e:
@@ -83,37 +83,37 @@ class UnifiedEmotionTracker:
             print(f"❌ Video file not found: {video_path}")
             return pd.DataFrame()
         
-        print(f"🎬 Processing video: {video_path}")
-        print(f"📊 Sample interval: {sample_interval} seconds")
+        print(f"[VIDEO] Processing video: {video_path}")
+        print(f"[INFO] Sample interval: {sample_interval} seconds")
         
         # Step 1: Extract audio from video
         temp_audio_path, video_duration = self.extract_audio_from_video(video_path)
         
         # Step 2: Process facial emotions
-        print("\n👤 Processing facial emotions...")
+        print("\n[FACIAL] Processing facial emotions...")
         facial_df = self.face_bot.process_video(video_path, sample_rate=sample_interval)
         
         # Step 3: Process voice emotions (if audio available)
         voice_df = pd.DataFrame()
         if temp_audio_path and os.path.exists(temp_audio_path):
-            print("\n🎤 Processing voice emotions...")
+            print("\n[VOICE] Processing voice emotions...")
             voice_df = self.voice_bot.process_audio_file(temp_audio_path, segment_duration=sample_interval)
             
             # Clean up temporary audio file
             if cleanup_temp:
                 try:
                     os.remove(temp_audio_path)
-                    print("🧹 Cleaned up temporary audio file")
+                    print("[CLEANUP] Cleaned up temporary audio file")
                 except:
                     pass
         else:
-            print("⚠️  No audio data available for voice analysis")
+            print("[WARNING] No audio data available for voice analysis")
         
         # Step 4: Synchronize the data
-        print("\n🔄 Synchronizing facial and voice data...")
+        print("\n[SYNC] Synchronizing facial and voice data...")
         synchronized_df = self.synchronize_emotion_data(facial_df, voice_df, sample_interval)
         
-        print(f"✅ Processing complete: {len(synchronized_df)} synchronized samples")
+        print(f"[OK] Processing complete: {len(synchronized_df)} synchronized samples")
         
         return synchronized_df
     
@@ -170,20 +170,16 @@ class UnifiedEmotionTracker:
                 voice_idx = (voice_df['time_seconds'] - current_time).abs().idxmin()
                 voice_row = voice_df.iloc[voice_idx]
                 
-                # Add voice emotion data
-                voice_columns = ['voice_arousal', 'voice_valence', 'voice_intensity', 'voice_stress',
-                               'voice_angry', 'voice_disgust', 'voice_fear', 'voice_happy',
-                               'voice_sad', 'voice_surprise', 'voice_neutral']
-                
-                for col in voice_columns:
-                    if col in voice_row:
-                        entry[col] = voice_row[col]
-                
-                # Add key voice features
-                feature_columns = ['pitch_mean', 'volume_mean', 'speech_rate', 'spectral_centroid']
-                for col in feature_columns:
-                    if col in voice_row:
-                        entry[col] = voice_row[col]
+                # Add ALL voice columns (not just a subset)
+                # Skip timestamp/time columns, add everything else with voice_ prefix if not already prefixed
+                for col in voice_row.index:
+                    if col not in ['timestamp', 'time_seconds']:
+                        # If column already starts with voice_, keep it as is
+                        if col.startswith('voice_'):
+                            entry[col] = voice_row[col]
+                        else:
+                            # Add voice_ prefix to acoustic features
+                            entry[f'voice_{col}'] = voice_row[col]
             
             # Calculate combined metrics
             self.calculate_combined_metrics(entry)
@@ -314,7 +310,7 @@ class UnifiedEmotionTracker:
         if 'speech_rate' in df.columns:
             axes[2].plot(time_data, df['speech_rate'] * 50, label='Speech Rate (×50)', linewidth=2, color='green')
         
-        axes[2].set_title('🎤 Voice Features Over Time', fontsize=14, fontweight='bold')
+        axes[2].set_title('Voice Features Over Time', fontsize=14, fontweight='bold')
         axes[2].set_ylabel('Feature Value')
         axes[2].legend()
         axes[2].grid(True, alpha=0.3)
@@ -327,7 +323,7 @@ class UnifiedEmotionTracker:
         if 'voice_intensity' in df.columns:
             axes[3].plot(time_data, df['voice_intensity'], label='Voice Intensity', linewidth=2, alpha=0.7, color='blue')
         
-        axes[3].set_title('⚡ Combined Emotional Intensity', fontsize=14, fontweight='bold')
+        axes[3].set_title('Combined Emotional Intensity', fontsize=14, fontweight='bold')
         axes[3].set_xlabel('Time (seconds)')
         axes[3].set_ylabel('Intensity Level')
         axes[3].legend()
@@ -338,7 +334,7 @@ class UnifiedEmotionTracker:
         
         if save_path:
             plt.savefig(save_path, dpi=300, bbox_inches='tight')
-            print(f"📊 Unified emotion plot saved to: {save_path}")
+            print(f"[SAVE] Unified emotion plot saved to: {save_path}")
         
         plt.show()
     
@@ -416,11 +412,11 @@ def main():
         df = tracker.process_video_unified(video_path, sample_interval=1.0)
         
         if not df.empty:
-            print(f"\n✅ Analysis complete: {len(df)} synchronized samples")
+            print(f"\n[OK] Analysis complete: {len(df)} synchronized samples")
             
             # Get summary
             summary = tracker.get_unified_summary()
-            print(f"\n📊 Analysis Summary:")
+            print(f"\n[SUMMARY] Analysis Summary:")
             print(f"Duration: {summary['duration_seconds']:.1f} seconds")
             print(f"Total samples: {summary['total_samples']}")
             
