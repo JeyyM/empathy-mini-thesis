@@ -1,0 +1,6 @@
+numpy
+scikit-learn
+nltk
+sentence-transformers  # optional, for --use-embeddings
+transformers           # optional, for --use-nli
+language_tool_python   # optional, grammar checks

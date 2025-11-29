@@ -1,0 +1,77 @@
+From here on, color code the aspects
+Red - Anger
+Orange - Surprise
+Yellow - Happy
+Green - Disgust
+Blue - Sad
+Violet - Fear
+Ash Gray - Neutral
+
+Intensity - Red
+Valence - Blue
+Arousal - Green
+
+Stressed - Orange
+Excited - Yellow
+Tired - Blue
+Calm - Green
+
+Facial Data
+- Emotion over time of all the 7 emotions
+- Highest overall: Show the linegraph but there will only be one line graph of just the most dominant color-coded
+- Summary statistics (mean, std dev, median, min, max, etc.) of all 7 emotions
+- Proportion pie graph and values of most dominant
+
+- Intensity, valence, and arousal over time
+- Intensity, valence, and arousal Summary statistics (mean, std dev, median, min, max, etc.)
+- Positivity and negativity over time
+- Emotion stability, such as number of emotion changes, standard deviation over time, etc.
+
+- Emotional State movement heatmap
+- Average emotional state values
+- Current emotional state over time
+- Emotional state proportion
+
+================================================
+
+Voice Data
+- Emotion over time of all the 7 emotions
+- Highest overall: Show the linegraph but there will only be one line graph of just the most dominant color-coded
+- Summary statistics (mean, std dev, median, min, max, etc.) of all 7 emotions
+- Proportion pie graph and values of most dominant
+
+- Arousal, Stress, valence, and arousal over time
+- Arousal, Stress, valence, and arousal averages
+- Pitch mean and variation
+- Volume mean and variation
+- Spectral centroid, and Rolloff
+- Zero crossing Rate
+- Acousting Features Summary statistics (mean, variations, range, std dev, median, min, max, etc.)
+- MFCC Coefficients
+
+- Positivity and negativity over time
+- Positivity and negativity average and proportion as dominant
+- Emotion stability, such as number of emotion changes, standard deviation over time, etc.
+
+- Emotional State movement heatmap
+- Average emotional state values
+- Current emotional state over time
+- Emotional state proportion
+
+================================================
+
+Fused Data
+- Emotion over time of all the 7 emotions
+- Highest overall: Show the linegraph but there will only be one line graph of just the most dominant color-coded
+- Summary statistics (mean, std dev, median, min, max, etc.) of all 7 emotions
+- Proportion pie graph and values of most dominant
+
+- Intensity, valence, and arousal over time
+- Intensity, valence, and arousal Summary statistics (mean, std dev, median, min, max, etc.)
+- Positivity and negativity over time
+- Emotion stability, such as number of emotion changes, standard deviation over time, etc.
+
+- Emotional State movement heatmap
+- Average emotional state values
+- Current emotional state over time
+- Emotional state proportion
