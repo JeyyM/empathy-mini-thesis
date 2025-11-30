@@ -1,0 +1,4 @@
+Category,Feature,Modality,Correlation_rho,P_Value,Significant
+Core Dimension,Intensity (mean),Facial,-0.13595728373467905,0.6290014486908408,
+Core Dimension,Valence (mean),Facial,0.12880163722232754,0.6473236737684194,
+Core Dimension,Arousal (mean),Facial,-0.08765666977630625,0.7560753371848143,
