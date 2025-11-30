@@ -1,0 +1,23 @@
+{
+  "Neutral": {
+    "neutral": 391,
+    "sad": 105,
+    "happy": 1,
+    "fear": 3
+  },
+  "Opposing": {
+    "neutral": 439,
+    "sad": 35,
+    "happy": 20,
+    "angry": 4,
+    "fear": 1,
+    "surprise": 1
+  },
+  "Similar": {
+    "neutral": 348,
+    "sad": 65,
+    "happy": 31,
+    "fear": 54,
+    "angry": 2
+  }
+}
