@@ -1,0 +1,16 @@
+Group,Name,Overall_Percentage,Letter_Grade,Semantic_Similarity,Topic_Coverage,Factual_Accuracy,Original_Words,Summary_Words,Compression_Ratio
+neutral,MiguelBorromeo,58.5,C,0.361,0.608,1.0,1185,73,0.062
+neutral,MiguelNg,35.8,D,0.2,0.32,1.0,2202,87,0.04
+neutral,RandellFabico,26.2,F,0.172,0.213,0.8,2057,63,0.031
+neutral,RusselGalan,42.9,D,0.207,0.427,1.0,1330,73,0.055
+neutral,RyanSo,65.4,B,0.55,0.64,1.0,2334,180,0.077
+opposing,AaronDionisio,34.2,D,0.689,0.107,1.0,1224,71,0.058
+opposing,ArianPates,57.8,C,0.803,0.427,1.0,2876,102,0.035
+opposing,EthanPlaza,75.2,A,0.746,0.747,0.8,3104,142,0.046
+opposing,MarwahMuti,85.4,A,0.414,1.0,1.0,2063,157,0.076
+opposing,SamuelLim,38.2,D,0.296,0.32,1.0,1483,77,0.052
+similar,AndreMarco,26.5,F,0.465,0.107,0.8,1640,31,0.019
+similar,EthanOng,45.9,C,0.604,0.32,1.0,2347,66,0.028
+similar,KeithziCantona,27.3,F,0.136,0.213,1.0,1190,85,0.071
+similar,MaggieOng,55.0,C,0.413,0.533,1.0,2244,103,0.046
+similar,SeanTe,45.5,C,0.588,0.32,1.0,2388,55,0.023

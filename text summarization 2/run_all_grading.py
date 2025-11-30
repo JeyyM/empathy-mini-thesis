@@ -5,6 +5,7 @@ Run grading on all chat/summary pairs and calculate averages per group
 
 import os
 import json
+import csv
 from main import ContentRecallGrader
 
 def run_grading():
@@ -12,6 +13,7 @@ def run_grading():
     groups = ["neutral", "opposing", "similar"]
     
     results = {group: [] for group in groups}
+    all_rows = []  # For CSV output
     
     grader = ContentRecallGrader()
     
@@ -53,6 +55,20 @@ def run_grading():
                 "percentage": result["overall_percentage"],
                 "grade": result["letter_grade"],
                 "breakdown": result["breakdown"]
+            })
+            
+            # Add to CSV rows
+            all_rows.append({
+                "Group": group,
+                "Name": name,
+                "Overall_Percentage": result["overall_percentage"],
+                "Letter_Grade": result["letter_grade"],
+                "Semantic_Similarity": result["breakdown"]["semantic_similarity"]["score"],
+                "Topic_Coverage": result["breakdown"]["topic_coverage"]["score"],
+                "Factual_Accuracy": result["breakdown"]["factual_accuracy"]["score"],
+                "Original_Words": result["summary_stats"]["original_words"],
+                "Summary_Words": result["summary_stats"]["summary_words"],
+                "Compression_Ratio": result["summary_stats"]["compression_ratio"]
             })
             
             print(f"\n{name}:")
@@ -100,6 +116,22 @@ def run_grading():
         print(f"OVERALL AVERAGE ACROSS ALL GROUPS: {overall_avg:.1f}%")
         print(f"Total Summaries Graded: {len(all_results)}")
         print(f"{'='*60}")
+    
+    # Save to CSV
+    if all_rows:
+        csv_filename = "grading_results.csv"
+        with open(csv_filename, 'w', newline='', encoding='utf-8') as csvfile:
+            fieldnames = ["Group", "Name", "Overall_Percentage", "Letter_Grade", 
+                         "Semantic_Similarity", "Topic_Coverage", "Factual_Accuracy",
+                         "Original_Words", "Summary_Words", "Compression_Ratio"]
+            writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+            
+            writer.writeheader()
+            for row in all_rows:
+                writer.writerow(row)
+        
+        print(f"\n✅ Results saved to: {csv_filename}")
+        print(f"   {len(all_rows)} summaries graded and exported")
 
 if __name__ == "__main__":
     run_grading()
