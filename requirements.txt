@@ -1,0 +1,23 @@
+# Consolidated requirements for Multimodal Empathy Prediction
+# Generated based on imports observed across the codebase
+
+numpy
+pandas
+scipy
+scikit-learn
+matplotlib
+seaborn
+statsmodels
+moviepy
+imageio
+imageio-ffmpeg
+librosa
+opencv-python
+soundfile
+numba
+requests
+tqdm
+
+# Optional: deep learning stack if using ML voice models (Wav2Vec2)
+transformers
+torch
