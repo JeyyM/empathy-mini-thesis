@@ -33,7 +33,7 @@ The original heterogeneous code has been preserved verbatim under `original_arch
 ## Quick Start
 ```powershell
 python -m pip install -r requirements.txt
-python run_pipeline.py --participant ArianPates --skip-ingestion False --skip-grading False --skip-analysis False --skip-prediction False
+python run_pipeline.py
 ```
 Generated artifacts will appear in:
 - `data/processed/` for intermediate CSVs
