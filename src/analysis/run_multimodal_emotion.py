@@ -51,8 +51,15 @@ def main():
     print("📊 PROCESSING PIPELINE")
     print("=" * 80)
     
-    # Generate base filename for outputs
-    base_filename = os.path.splitext(video_path)[0].replace(" ", "_")
+    # Generate base filename and results output directory
+    base_filename = os.path.splitext(os.path.basename(video_path))[0].replace(" ", "_")
+    results_root = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "results")
+    output_dir = os.path.join(results_root, base_filename)
+    try:
+        os.makedirs(output_dir, exist_ok=True)
+    except Exception:
+        print(f"⚠️ Could not create results folder at '{output_dir}', falling back to current directory")
+        output_dir = os.getcwd()
     
     # ========== STEP 1: Analyze Video (Facial + Voice with ML) ==========
     print("\n[1/4] 🎬 Analyzing video for facial expressions and voice emotions...")
@@ -69,7 +76,7 @@ def main():
         return
     
     # Save unified emotion data
-    unified_csv = f"{base_filename}_ml_emotion_data.csv"
+    unified_csv = os.path.join(output_dir, f"{base_filename}_ml_emotion_data.csv")
     unified_df.to_csv(unified_csv, index=False)
     print(f"\n✅ Unified emotion data saved: {unified_csv}")
     print(f"   Total samples: {len(unified_df)}")
@@ -80,7 +87,7 @@ def main():
     fusion = MultimodalEmotionFusion(w_facial=0.7, w_voice=0.3)
     fused_df = fusion.fuse_data(unified_csv)
     
-    fusion_csv = f"{base_filename}_ml_fusion.csv"
+    fusion_csv = os.path.join(output_dir, f"{base_filename}_ml_fusion.csv")
     print(f"✅ Fusion data saved: {fusion_csv}")
     
     # ========== STEP 3: Generate Facial Reports ==========
@@ -89,18 +96,18 @@ def main():
     facial_generator = FacialReportGenerator()
     
     print("   📊 Generating facial emotions report...")
-    facial_generator.generate_emotion_report(unified_df, f"{base_filename}_ml")
+    facial_generator.generate_emotion_report(unified_df, os.path.join(output_dir, f"{base_filename}_ml"))
     
     print("   📊 Generating facial dimensions report...")
-    facial_generator.generate_dimensions_report(unified_df, f"{base_filename}_ml")
+    facial_generator.generate_dimensions_report(unified_df, os.path.join(output_dir, f"{base_filename}_ml"))
     
     print("   📊 Generating facial states report...")
-    facial_generator.generate_states_report(unified_df, f"{base_filename}_ml")
+    facial_generator.generate_states_report(unified_df, os.path.join(output_dir, f"{base_filename}_ml"))
     
     print(f"\n✅ Facial reports generated:")
-    print(f"   - {base_filename}_ml_facial_emotions.png")
-    print(f"   - {base_filename}_ml_facial_dimensions.png")
-    print(f"   - {base_filename}_ml_facial_states.png")
+    print(f"   - {os.path.join(output_dir, f'{base_filename}_ml_facial_emotions.png')}")
+    print(f"   - {os.path.join(output_dir, f'{base_filename}_ml_facial_dimensions.png')}")
+    print(f"   - {os.path.join(output_dir, f'{base_filename}_ml_facial_states.png')}")
     
     # ========== STEP 4: Generate Voice Reports ==========
     print("\n[4/4] 🎤 Generating voice emotion reports (ML-based)...")
@@ -108,22 +115,22 @@ def main():
     voice_generator = VoiceReportGenerator()
     
     print("   📊 Generating voice emotions report...")
-    voice_generator.generate_emotion_report(unified_df, f"{base_filename}_ml")
+    voice_generator.generate_emotion_report(unified_df, os.path.join(output_dir, f"{base_filename}_ml"))
     
     print("   📊 Generating voice acoustic features report...")
-    voice_generator.generate_acoustic_report(unified_df, f"{base_filename}_ml")
+    voice_generator.generate_acoustic_report(unified_df, os.path.join(output_dir, f"{base_filename}_ml"))
     
     print("   📊 Generating voice dimensions report...")
-    voice_generator.generate_dimensions_report(unified_df, f"{base_filename}_ml")
+    voice_generator.generate_dimensions_report(unified_df, os.path.join(output_dir, f"{base_filename}_ml"))
     
     print("   📊 Generating voice states report...")
-    voice_generator.generate_states_report(unified_df, f"{base_filename}_ml")
+    voice_generator.generate_states_report(unified_df, os.path.join(output_dir, f"{base_filename}_ml"))
     
     print(f"\n✅ Voice reports generated (ML-enhanced):")
-    print(f"   - {base_filename}_ml_voice_emotions.png")
-    print(f"   - {base_filename}_ml_voice_acoustic.png")
-    print(f"   - {base_filename}_ml_voice_dimensions.png")
-    print(f"   - {base_filename}_ml_voice_states.png")
+    print(f"   - {os.path.join(output_dir, f'{base_filename}_ml_voice_emotions.png')}")
+    print(f"   - {os.path.join(output_dir, f'{base_filename}_ml_voice_acoustic.png')}")
+    print(f"   - {os.path.join(output_dir, f'{base_filename}_ml_voice_dimensions.png')}")
+    print(f"   - {os.path.join(output_dir, f'{base_filename}_ml_voice_states.png')}")
     
     # ========== STEP 5: Generate Fusion Reports ==========
     print("\n[5/5] 🔮 Generating fusion emotion reports...")
@@ -132,9 +139,9 @@ def main():
     generate_all_reports(fusion_csv)
     
     print(f"\n✅ Fusion reports generated:")
-    print(f"   - {base_filename}_ml_fusion_emotions.png")
-    print(f"   - {base_filename}_ml_fusion_dimensions.png")
-    print(f"   - {base_filename}_ml_fusion_states.png")
+    print(f"   - {os.path.join(output_dir, f'{base_filename}_ml_fusion_emotions.png')}")
+    print(f"   - {os.path.join(output_dir, f'{base_filename}_ml_fusion_dimensions.png')}")
+    print(f"   - {os.path.join(output_dir, f'{base_filename}_ml_fusion_states.png')}")
     
     # ========== SUMMARY ==========
     print("\n" + "=" * 80)
