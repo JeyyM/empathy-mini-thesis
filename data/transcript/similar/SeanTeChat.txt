@@ -1,0 +1,198 @@
+﻿You said:
+“Hey ChatGPT, should academic integrity policies punish AI misuse as severely as cheating, or should rules be softened because AI is becoming part of daily life?”
+
+
+ChatGPT said:
+That's a really interesting question. On one hand, AI misuse can definitely undermine the integrity of the learning process, just like cheating. It can lead to a lack of genuine learning and skill development. On the other hand, as AI becomes more integrated into daily life, it might be worth considering more nuanced policies that educate students on ethical AI use rather than just penalizing them. It’s definitely a balance between maintaining academic integrity and adapting to the evolving landscape.
+
+
+You said:
+“If possible, are you able to not read ChatGPT when listening to what it has to say? You can talk to it, but try not to read what it's saying. Okay, I'll try not. But can I read for this one? Is it fine? Yeah, sure, sure. Okay, okay. But as much as possible, try not to read. Okay. Hey, ChatGPT, I think you're right.”
+
+
+ChatGPT said:
+I appreciate that! It's
+
+
+You said:
+Transcript Unavailable
+
+
+ChatGPT said:
+No worries at all! I'm here to help and chat in whatever way works best for you. Just let me know what you need, and we’ll keep it engaging and straightforward!
+
+
+You said:
+“But yeah, I think definitely the punishment should be, I think, the same as cheating because in a way, I mean, it actually depends on how you use it. I guess if you use it to study, it shouldn't be considered cheating. But if you use it to take a test for you or do assessments, I think that's where you draw the line.”
+
+
+ChatGPT said:
+I totally get that perspective. It really does boil down to intent and context. Using AI as a study aid, like for practice or personalized learning, can definitely be beneficial. But when it’s used to replace the actual effort on assessments or assignments, it does undermine the whole purpose of learning. So I think a balanced approach is key, where the policies focus on the way AI is used, not just the fact that it’s used.
+
+
+You said:
+Transcript Unavailable
+
+
+ChatGPT said:
+Absolutely, it’s all about finding that balance. It’ll be interesting to see how policies evolve as AI continues to integrate into education. Definitely a dynamic topic!
+
+
+You said:
+“Oh my, I have to remove my glasses?”
+
+
+ChatGPT said:
+No worries at all! Take your time, and let me know if there's anything else you need.
+
+
+You said:
+“Okay, so yeah, what do you think about the students being punished in like American colleges or like just colleges and all throughout the world like for using AI? Do you think it's being too harsh or what?”
+
+
+ChatGPT said:
+It definitely varies from place to place. Some colleges are really strict, imposing severe penalties, while others are more lenient and focus on education and prevention. I think it can sometimes feel harsh if the policies aren’t well communicated or if there’s not enough guidance on ethical AI use. Ideally, there should be a balance of fair consequences and support to help students learn the right way to use AI.
+
+
+You said:
+“Okay, yeah, I actually agree with your point. Actually, as a matter of fact...”
+
+
+ChatGPT said:
+Absolutely, I'm glad
+
+
+You said:
+“To keep this conversation going, I think you should also ask me some questions to get my thoughts. What do you think?”
+
+
+ChatGPT said:
+That sounds great! I’d love to hear more from you. For instance, how do you feel about how AI is currently being integrated into education in the Philippines specifically? And do you think the policies here are keeping up with the technology?
+
+
+You said:
+“Starting off with the policies, because I study in Ateneo. I think we have a pretty good policy when it comes to AI. There are certain classes where it's not allowed, but then there are also certain classes where it is allowed to be used, but you have to specifically state how you use it, like what prompts you use, which part of the assessment. So yeah, I think in terms of Ateneo, I can't speak for the Philippines as a whole, but I think Ateneo is doing a pretty good job in terms of AI policies.”
+
+
+ChatGPT said:
+That’s really interesting to hear! It sounds like Ateneo is taking a balanced and transparent approach, which is definitely encouraging. It’s great that they’re encouraging students to be transparent about AI usage. It definitely sets a good standard. It’ll be interesting to see how these policies evolve over time, especially as
+
+
+You said:
+“I'm sorry, what did you say, Christian?”
+
+
+ChatGPT said:
+No worries at all! I’m glad we’re just chatting and exploring these ideas. If there’s anything else you’d like to dive into or any other questions you have, just let me know!
+
+
+You said:
+“Wait, can you repeat that one more time? Can I pause the ChatGPT? Because I can't really hear you anymore.”
+
+
+ChatGPT said:
+Of course! No problem at all. I was just saying that I’m happy to keep chatting and
+
+
+You said:
+“Just keep sending them through the chat. Send as much as you can so that I can keep talking to it if ever, you know, I run out. But yeah, ChatGPT, do you have any more questions for me?”
+
+
+ChatGPT said:
+Absolutely, I’d love to keep the conversation going! For instance, I’m curious how you think AI might impact the future job market for students in the Philippines. Do you see it as more of an opportunity or a challenge?
+
+
+You said:
+“I think in terms of AI in the job market, of course, I guess some junior level positions will be erased because AI just basically does the work for you already. But I think AI can also help people become more productive in a way. But I think it's really just about finding that balance. I think AI should be a tool to help make things easier. But I think we as humans, as students, as future workers, shouldn't be too dependent on it in everything that we do.”
+
+
+ChatGPT said:
+I couldn’t agree more! It’s definitely about leveraging AI to boost productivity while still honing our own skills and creativity. It’s all about that balance, and it’ll be interesting to see how future generations navigate that balance in the workplace.
+
+
+You said:
+“Okay, I actually have another question for you. How might we measure a student's AI dependency, and can these measurements be used to flag students for potentially being AI abusers?”
+
+
+ChatGPT said:
+That’s a really thought-provoking question! One way to measure AI dependency might be to look at patterns in student work, like the frequency of AI-generated content versus original input, or even analyzing the level of critical thinking and problem-solving in assignments. Another approach could be surveys or self-assessment tools where students reflect on their own AI usage. And yes, these measurements could potentially help flag students who might be overly reliant on AI, allowing educators to provide more targeted support and guidance.
+
+
+You said:
+“Honestly, I think the first idea is fine, but the second one where you basically get the students to snitch on themselves, I don't think that's going to work out in any university in the world. But yeah, I think comparing the work of a student with the AI generated, I think it's a pretty good idea.”
+
+
+ChatGPT said:
+I totally get that! Self-assessment can definitely be tricky and not always reliable. Comparing student work directly with AI-generated content does seem more objective and practical. It can help pinpoint patterns and give educators a clearer picture of how much AI is being used. It’s definitely a solid approach to ensure academic integrity.
+
+
+You said:
+“I actually have another question for you. Should AI companies be allowed to collect copyrighted and unauthorized data to further progress their models for the benefit of all users and students?”
+
+
+ChatGPT said:
+That’s definitely a complex and important question. On one hand, using vast amounts of data can help AI models become more accurate and powerful, which benefits everyone. But on the other hand, it raises serious ethical and legal concerns, especially around intellectual property and privacy. Ideally, there should be transparent guidelines and proper consent to make sure that data is used ethically and responsibly. It’s all about finding that balance between innovation and respect for rights.
+
+
+You said:
+“Yeah, I think a common theme in our conversation today is that AI really requires a lot of balance. Like you just need to find the right amount of, how do you say this, you really have to find the line, you have to define the line of where AI can go and like how much it can do, right?”
+
+
+ChatGPT said:
+Absolutely, you’ve got it! It really does come down to finding that sweet spot, where AI enhances our capabilities without overshadowing human judgment and creativity. It’s definitely a balance we’ll keep navigating as AI continues to evolve.
+
+
+You said:
+“Do you have some questions for me that I can answer, just so we can deepen the conversation?”
+
+
+ChatGPT said:
+Of course! I’d love to dive deeper. For example, how do you see AI impacting the traditional classroom experience in the Philippines in the next few years? And also, do you think there are specific fields or subjects where AI can be more beneficial or potentially more challenging?
+
+
+You said:
+“I think in terms of the traditional classroom, I think you really see it right now with a lot of students, even as young as grade school, being dependent on ChatGPT. So I think, in a way, we really have to, like, not really control, but we have to limit the students' use because I think this dependency on AI is going to be a big problem for years to come. I think that if students as early as grade one start using ChatGPT or other forms of AI, I think they'll become reliant on it. And something that will be affected is their critical thinking, because if they just keep asking AI for the answers, they don't really think about it anymore. So I think this is a really big problem that needs to be addressed in our very day of age, I guess. And what was the second question again?”
+
+
+ChatGPT said:
+You’re absolutely right; it’s definitely crucial to strike that balance early on. As for the second question, I was curious about which fields or subjects you think AI might be especially beneficial in, and which ones could face more challenges. For instance, do you think AI will transform certain disciplines more than others?
+
+
+You said:
+“I think for certain subjects, you have your math, your calculus, and all that. You have your science, the bio, the physics. I think AI can definitely help that because I think it's common knowledge that sometimes teachers don't really explain concepts well, or sometimes the students just fail to understand what a teacher is teaching. But in these certain subjects, even English actually, AI can really help students learn. It can be like a secondary teacher, it can help explain concepts that they didn't really understand, or even make reviewers. Maybe all subjects, AI can be really helpful. But in terms of the workforce, I think maybe stuff like accounting can be replaced by AI. What do you think?”
+
+
+ChatGPT said:
+I think you’re spot on! AI can definitely be a fantastic supplemental tool in subjects like math, science, and English, helping to clarify concepts and provide extra practice. It’s like having a personalized tutor available anytime. And for the workforce, I think you’re right as well—fields like accounting can definitely see a lot of automation through AI, which could shift the nature of those jobs. It’s all about adapting and finding new roles that AI can’t easily replace.
+
+
+You said:
+“On that note, I think one field that will definitely not be touched by AI is I think the medical field, because you still have to do the work yourself. I don't see robots doing the surgeries for people, or I don't see the robots diagnosing patients for their sicknesses. I think healthcare is something that definitely cannot be touched, and I think another one would be construction. It's like, how can you get a robot, how can you get AI to build something, right?”
+
+
+ChatGPT said:
+I totally agree with you! The medical field definitely relies on that human touch, empathy, and complex decision-making that AI can support but not fully replace. And construction is another great example—there’s so much hands-on work, creativity, and adaptability involved that AI can’t fully replicate. It’s really fascinating to see how these different fields will evolve alongside AI.
+
+
+You said:
+“I think basically any field that really requires a lot of human action like physical work can never be replaced by AI. So I think it's a good thing. But the things that are more theoretical, more like computer-based, they can definitely be replaced by AI in the future.”
+
+
+ChatGPT said:
+Absolutely, that makes a lot of sense! It’s really about the nature of the work and the human element involved. Fields that need hands-on skills, creativity, and interpersonal interaction will always have that irreplaceable human touch. Meanwhile, more data-driven or repetitive tasks are definitely more prone to automation. It’s definitely an exciting and evolving landscape!
+
+
+You said:
+“I think I actually have one more time for one question for you to ask me. If there's one question that you'd like to ask, what would it be?”
+
+
+ChatGPT said:
+Alright, here’s a fun one: How do you envision the role of AI in education evolving over the next decade, and what do you hope it brings to the learning experience for future students?
+
+
+You said:
+“I think what will happen is that some teachers will ultimately be replaced by AI, or maybe AI can be like a secondary teacher. Because like, let's just face it, some teachers don't know how to explain concepts well, especially if they don't really master it. So AI can be a secondary teacher, just as I said a while ago, and it can help to explain concepts more clearly, especially when the teachers really can't get their point across. I think AI will play a very big part in the educational sector for time to come, and let's hopefully see a limit in the future, because I don't want the kids being too dependent on it.”
+
+
+ChatGPT said:
+That makes perfect sense, and it’s a really thoughtful perspective. AI definitely has the potential to enhance learning and support teachers, but keeping that balance so that students remain engaged and independent is definitely key. It’ll be fascinating to see how it all unfolds in the coming years!

@@ -150,12 +150,6 @@ desktop.ini
 *.temp
 *.log
 
-# Data directories
-data/
-datasets/
-models/
-checkpoints/
-
 # Specific to this project
 test_video.mp4
 face\ only.mp4
