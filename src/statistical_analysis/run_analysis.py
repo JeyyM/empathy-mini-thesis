@@ -10,7 +10,7 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import pandas as pd
 
-from analysis import loader, normalizer, analysis_module
+from statistical_analysis import loader, normalizer, analysis_module
 
 
 def ensure_dir(p: str):

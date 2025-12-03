@@ -6,10 +6,10 @@ Run grading on all chat/summary pairs and calculate averages per group
 import os
 import json
 import csv
-from main import ContentRecallGrader
+from run_assessment import ContentRecallGrader
 
 def run_grading():
-    base_path = "files"
+    base_path = "data\\transcript"
     groups = ["neutral", "opposing", "similar"]
     
     results = {group: [] for group in groups}
@@ -119,7 +119,7 @@ def run_grading():
     
     # Save to CSV
     if all_rows:
-        csv_filename = "grading_results.csv"
+        csv_filename = "data\grading_results.csv"
         with open(csv_filename, 'w', newline='', encoding='utf-8') as csvfile:
             fieldnames = ["Group", "Name", "Overall_Percentage", "Letter_Grade", 
                          "Semantic_Similarity", "Topic_Coverage", "Factual_Accuracy",

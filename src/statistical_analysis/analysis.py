@@ -172,10 +172,11 @@ def load_group_data(data_path: str) -> Dict[str, pd.DataFrame]:
     else:
         base_path = data_path
     
+    # CHECK THIS AGAIN
     facial_df = pd.read_csv(os.path.join(base_path, 'correlation', 'facial_summary_merged.csv'))
     voice_df = pd.read_csv(os.path.join(base_path, 'correlation', 'voice_summary_merged.csv'))
     fusion_df = pd.read_csv(os.path.join(base_path, 'correlation', 'fusion_summary_merged.csv'))
-    summary_df = pd.read_csv(os.path.join(base_path, 'text summarization 2', 'grading_results.csv'))
+    summary_df = pd.read_csv(os.path.join('data\grading_results.csv'))
     
     return {
         'facial': facial_df,

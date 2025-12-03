@@ -16,7 +16,7 @@ import os
 # Add parent directory to path
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from analysis import run_essential_analysis, print_summary_report
+from statistical_analysis import run_essential_analysis, print_summary_report
 
 if __name__ == "__main__":
     # Set path to workspace root (go up two levels from analysis folder)

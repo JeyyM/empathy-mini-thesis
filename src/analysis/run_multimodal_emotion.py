@@ -51,14 +51,14 @@ def main():
     print("📊 PROCESSING PIPELINE")
     print("=" * 80)
     
-    # Generate base filename and results output directory
+    # Generate base filename and output output directory
     base_filename = os.path.splitext(os.path.basename(video_path))[0].replace(" ", "_")
-    results_root = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "results")
-    output_dir = os.path.join(results_root, base_filename)
+    output_root = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "output/multi_modal_analysis")
+    output_dir = os.path.join(output_root, base_filename)
     try:
         os.makedirs(output_dir, exist_ok=True)
     except Exception:
-        print(f"⚠️ Could not create results folder at '{output_dir}', falling back to current directory")
+        print(f"⚠️ Could not create output folder at '{output_dir}', falling back to current directory")
         output_dir = os.getcwd()
     
     # ========== STEP 1: Analyze Video (Facial + Voice with ML) ==========

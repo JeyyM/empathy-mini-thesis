@@ -32,7 +32,7 @@ plt.rcParams['figure.facecolor'] = 'white'
 
 def load_data(modality='fusion'):
     """Load the merged data for specified modality"""
-    data_path = f'../correlation/{modality}_summary_merged.csv'
+    data_path = f'../data/correlation_data/{modality}_summary_merged.csv'
     df = pd.read_csv(data_path)
     return df
 

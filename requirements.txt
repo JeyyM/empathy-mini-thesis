@@ -19,4 +19,14 @@ matplotlib>=3.7.0
 
 # Optional: Advanced audio analysis
 # opensmile>=2.4.0  # Uncomment if you want to use OpenSMILE features
-# pyaudioanalysis>=0.3.0  # Uncomment for additional audio analysis
+# pyaudioanalysis>=0.3.0  # Uncomment for additional audio analysis\
+
+
+# For Running Summary Assessment
+nltk
+sentence-transformers  # optional, for --use-embeddings
+transformers           # optional, for --use-nli
+language_tool_python   # optional, grammar checks
+
+# For Statistical Analysis
+statsmodels

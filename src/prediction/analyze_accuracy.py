@@ -5,7 +5,7 @@ import pandas as pd
 from scipy import stats
 
 # Load results
-df = pd.read_csv('individual_predictions.csv')
+df = pd.read_csv('output\prediction_analysis\individual_predictions.csv')
 
 print('='*80)
 print('PREDICTION MODEL ACCURACY SUMMARY')

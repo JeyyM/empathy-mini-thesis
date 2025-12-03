@@ -7,6 +7,7 @@ Groups features by category and shows all three modalities (facial, voice, fusio
 
 import os
 import sys
+from pathlib import Path
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -21,11 +22,36 @@ if sys.platform == 'win32':
 sns.set_style("whitegrid")
 plt.rcParams['figure.facecolor'] = 'white'
 
+OUTPUTS_DIR = Path("outputs") / "correlation_analysis"
+OUTPUTS_DIR.mkdir(parents=True, exist_ok=True)
+
+def _resolve_path(filename: str) -> Path:
+    """Return the first existing path for the given filename across common roots."""
+    candidates = [
+        OUTPUTS_DIR / filename,
+        Path("output") / "correlation_data" / filename,
+        Path("outputs") / "correlation_data" / filename,
+        Path("data") / "correlation_data" / filename,
+    ]
+    for p in candidates:
+        if p.exists():
+            return p
+    # Default to OUTPUTS_DIR/filename even if missing (will likely be written later)
+    return OUTPUTS_DIR / filename
+
 def load_all_data():
     """Load merged data from all three modalities"""
-    facial_df = pd.read_csv('facial_summary_merged.csv')
-    voice_df = pd.read_csv('voice_summary_merged.csv')
-    fusion_df = pd.read_csv('fusion_summary_merged.csv')
+    facial_path = _resolve_path('facial_summary_merged.csv')
+    voice_path = _resolve_path('voice_summary_merged.csv')
+    fusion_path = _resolve_path('fusion_summary_merged.csv')
+    if not facial_path.exists() or not voice_path.exists() or not fusion_path.exists():
+        print("⚠️  One or more merged CSVs are missing. Checked:")
+        print(f"    - {facial_path}")
+        print(f"    - {voice_path}")
+        print(f"    - {fusion_path}")
+    facial_df = pd.read_csv(facial_path)
+    voice_df = pd.read_csv(voice_path)
+    fusion_df = pd.read_csv(fusion_path)
     
     return facial_df, voice_df, fusion_df
 
@@ -123,8 +149,9 @@ def visualize_core_dimensions(facial_df, voice_df, fusion_df):
             )
     
     plt.tight_layout()
-    plt.savefig('scatter_core_dimensions.png', dpi=300, bbox_inches='tight')
-    print("✅ Saved: scatter_core_dimensions.png")
+    out_path = OUTPUTS_DIR / 'scatter_core_dimensions.png'
+    plt.savefig(out_path, dpi=300, bbox_inches='tight')
+    print(f"✅ Saved: {out_path.resolve()}")
     plt.close()
 
 def visualize_emotions(facial_df, voice_df, fusion_df):
@@ -185,9 +212,9 @@ def visualize_emotions(facial_df, voice_df, fusion_df):
                 )
         
         plt.tight_layout()
-        filename = f'scatter_emotions_page{page+1}.png'
+        filename = OUTPUTS_DIR / f'scatter_emotions_page{page+1}.png'
         plt.savefig(filename, dpi=300, bbox_inches='tight')
-        print(f"✅ Saved: {filename}")
+        print(f"✅ Saved: {filename.resolve()}")
         plt.close()
 
 def visualize_volatility_features(facial_df, voice_df, fusion_df):
@@ -237,8 +264,9 @@ def visualize_volatility_features(facial_df, voice_df, fusion_df):
             )
     
     plt.tight_layout()
-    plt.savefig('scatter_volatility.png', dpi=300, bbox_inches='tight')
-    print("✅ Saved: scatter_volatility.png")
+    out_path = OUTPUTS_DIR / 'scatter_volatility.png'
+    plt.savefig(out_path, dpi=300, bbox_inches='tight')
+    print(f"✅ Saved: {out_path.resolve()}")
     plt.close()
 
 def visualize_transitions(facial_df, voice_df, fusion_df):
@@ -288,8 +316,9 @@ def visualize_transitions(facial_df, voice_df, fusion_df):
             )
     
     plt.tight_layout()
-    plt.savefig('scatter_transitions.png', dpi=300, bbox_inches='tight')
-    print("✅ Saved: scatter_transitions.png")
+    out_path = OUTPUTS_DIR / 'scatter_transitions.png'
+    plt.savefig(out_path, dpi=300, bbox_inches='tight')
+    print(f"✅ Saved: {out_path.resolve()}")
     plt.close()
 
 def visualize_voice_acoustic(voice_df):
@@ -324,8 +353,9 @@ def visualize_voice_acoustic(voice_df):
             )
     
     plt.tight_layout()
-    plt.savefig('scatter_voice_acoustic.png', dpi=300, bbox_inches='tight')
-    print("✅ Saved: scatter_voice_acoustic.png")
+    out_path = OUTPUTS_DIR / 'scatter_voice_acoustic.png'
+    plt.savefig(out_path, dpi=300, bbox_inches='tight')
+    print(f"✅ Saved: {out_path.resolve()}")
     plt.close()
 
 def create_summary_table(facial_df, voice_df, fusion_df):
@@ -394,7 +424,8 @@ def create_summary_table(facial_df, voice_df, fusion_df):
         return
     
     summary_df = summary_df.sort_values('Correlation_rho', key=abs, ascending=False)
-    summary_df.to_csv('scatter_correlations_summary.csv', index=False)
+    out_csv = OUTPUTS_DIR / 'scatter_correlations_summary.csv'
+    summary_df.to_csv(out_csv, index=False)
     
     print("\n" + "="*80)
     print("TOP CORRELATIONS SUMMARY")
@@ -431,14 +462,14 @@ def main():
     print("✅ ALL VISUALIZATIONS COMPLETE!")
     print("="*80)
     print("\nGenerated files:")
-    print("  📊 scatter_core_dimensions.png - Valence, Arousal, Intensity")
-    print("  📊 scatter_emotions_page1.png - Happy, Sad, Angry")
-    print("  📊 scatter_emotions_page2.png - Fear, Surprise, Disgust")
-    print("  📊 scatter_emotions_page3.png - Neutral")
-    print("  📊 scatter_volatility.png - Emotional volatility metrics")
-    print("  📊 scatter_transitions.png - Quadrant transitions & changes")
-    print("  📊 scatter_voice_acoustic.png - Voice acoustic features")
-    print("  📄 scatter_correlations_summary.csv - Summary statistics")
+    print(f"  📊 {OUTPUTS_DIR / 'scatter_core_dimensions.png'} - Valence, Arousal, Intensity")
+    print(f"  📊 {OUTPUTS_DIR / 'scatter_emotions_page1.png'} - Happy, Sad, Angry")
+    print(f"  📊 {OUTPUTS_DIR / 'scatter_emotions_page2.png'} - Fear, Surprise, Disgust")
+    print(f"  📊 {OUTPUTS_DIR / 'scatter_emotions_page3.png'} - Neutral")
+    print(f"  📊 {OUTPUTS_DIR / 'scatter_volatility.png'} - Emotional volatility metrics")
+    print(f"  📊 {OUTPUTS_DIR / 'scatter_transitions.png'} - Quadrant transitions & changes")
+    print(f"  📊 {OUTPUTS_DIR / 'scatter_voice_acoustic.png'} - Voice acoustic features")
+    print(f"  📄 {OUTPUTS_DIR / 'scatter_correlations_summary.csv'} - Summary statistics")
     print("="*80 + "\n")
 
 if __name__ == "__main__":

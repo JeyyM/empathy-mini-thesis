@@ -4,27 +4,59 @@ Correlate fusion (combined facial+voice) emotion data with summary grading resul
 """
 
 import os
+from pathlib import Path
 import pandas as pd
 import numpy as np
 from scipy import stats
 import matplotlib.pyplot as plt
 import seaborn as sns
 
+# Centralized output directory for this script
+OUTPUTS_DIR = Path("outputs") / "correlation_analysis"
+OUTPUTS_DIR.mkdir(parents=True, exist_ok=True)
+
 def load_summary_grades():
     """Load the summary grading results"""
-    grades_path = "../text summarization 2/grading_results.csv"
+    grades_path = Path("data") / "grading_results.csv"
+    if not grades_path.exists():
+        print(f"⚠️  Grading results not found at: {grades_path.resolve()}")
     df = pd.read_csv(grades_path)
     return df
 
+
+def _resolve_fusion_csv_path(group: str, name: str) -> Path | None:
+    """
+    Try multiple candidate locations for the fusion CSV to be robust against
+    minor differences in output folder names and group casing.
+    """
+    candidates: list[Path] = []
+    # Roots that might be used by other parts of the pipeline
+    roots = [Path("outputs"), Path("output")]
+    group_variants = [str(group).capitalize(), str(group)]
+
+    for root in roots:
+        for g in group_variants:
+            dir_path = root / "multi_modal_analysis" / g / name
+            candidates.append(dir_path / f"Final{name}_ml_fusion.csv")
+
+    for p in candidates:
+        if p.exists():
+            return p
+
+    if candidates:
+        print("⚠️  Fusion CSV not found. Tried:")
+        for p in candidates:
+            try:
+                print(f"    - {p.resolve()}")
+            except Exception:
+                print(f"    - {p}")
+    return None
+
 def extract_fusion_stats(group, name):
     """Extract comprehensive fusion emotion statistics from the fusion CSV"""
-    # Construct the file path
-    base_path = f"../results/{group.capitalize()}/{name}"
-    csv_file = f"Final{name}_ml_fusion.csv"
-    file_path = os.path.join(base_path, csv_file)
-    
-    if not os.path.exists(file_path):
-        print(f"⚠️  File not found: {file_path}")
+    # Resolve the file path robustly
+    file_path = _resolve_fusion_csv_path(group, name)
+    if file_path is None:
         return None
     
     # Load the fusion data
@@ -236,8 +268,9 @@ def correlate_fusion_with_summary():
     merged_df = merged_df.drop(['group', 'name'], axis=1)
     
     # Save merged data
-    merged_df.to_csv('fusion_summary_merged.csv', index=False)
-    print(f"✅ Merged data saved to: fusion_summary_merged.csv")
+    merged_path = OUTPUTS_DIR / 'fusion_summary_merged.csv'
+    merged_df.to_csv(merged_path, index=False)
+    print(f"✅ Merged data saved to: {merged_path.resolve()}")
     print(f"   {len(merged_df)} participants with complete data")
     print(f"   {len(merged_df.columns)} total features extracted")
     
@@ -315,8 +348,9 @@ def correlate_fusion_with_summary():
     # Save correlation results
     corr_df = pd.DataFrame(correlation_results)
     corr_df = corr_df.sort_values('Abs_Correlation', ascending=False)
-    corr_df.to_csv('fusion_summary_correlations.csv', index=False)
-    print(f"\n✅ Correlation results saved to: fusion_summary_correlations.csv")
+    corr_path = OUTPUTS_DIR / 'fusion_summary_correlations.csv'
+    corr_df.to_csv(corr_path, index=False)
+    print(f"\n✅ Correlation results saved to: {corr_path.resolve()}")
     print(f"   {len(corr_df)} total correlations calculated")
     print(f"   {len(corr_df[corr_df['Significant'] == 'Yes'])} significant correlations (p < 0.05)")
     
@@ -390,8 +424,9 @@ def create_correlation_heatmap(merged_df, fusion_metrics, summary_metrics):
     plt.ylabel('Fusion Feature Metrics', fontsize=12)
     plt.tight_layout()
     
-    plt.savefig('fusion_summary_correlation_heatmap.png', dpi=300, bbox_inches='tight')
-    print(f"\n✅ Heatmap saved to: fusion_summary_correlation_heatmap.png")
+    heatmap_path = OUTPUTS_DIR / 'fusion_summary_correlation_heatmap.png'
+    plt.savefig(heatmap_path, dpi=300, bbox_inches='tight')
+    print(f"\n✅ Heatmap saved to: {heatmap_path.resolve()}")
     plt.close()
 
 if __name__ == "__main__":

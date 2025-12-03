@@ -1,5 +1,5 @@
-from src.analysis.emotion_bot import EmotionBot
-from src.analysis.voice_emotion_bot import VoiceEmotionBot
+from emotion_bot import EmotionBot
+from voice_emotion_bot import VoiceEmotionBot
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
