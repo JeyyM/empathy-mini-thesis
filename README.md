@@ -71,9 +71,6 @@ Outputs in `results/<Name>/`:
 - `<Name>_ml_fusion.csv` (fused + derived metrics and states)
 - PNGs: facial/voice/fusion emotions, dimensions, states, acoustic
 
-## (No Monolithic Pipeline File)
-This repository does not include a single `run_pipeline.py`. Use the scripts above for analysis, grading, correlations, and prediction.
-
 ## Grading (Summary Assessment)
 - Batch grading across all groups:
 ```powershell
@@ -120,3 +117,9 @@ python .\src\prediction\predict_fusion_only.py
 ## Notes
 - Tested on Windows PowerShell. Figures are saved as PNG; CSVs use UTF-8.
 - Exact library versions are pinned in `requirements.txt`.
+
+## Contributors
+- Ewan Rafael A. Escano
+- Gerard Christian A. Felipe
+- Andre Gabriel D. Llanes
+- Juan Miguel B. Miranda
