@@ -151,5 +151,6 @@ desktop.ini
 *.log
 
 # Specific to this project
+data\video\ArianPates.mp4
 test_video.mp4
 face\ only.mp4

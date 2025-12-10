@@ -49,7 +49,7 @@ python .\src\prediction\predict_fusion_only.py
 	- `processed/master_summary_scores.csv` (pipeline Step B labels)
 	- `grading_results.csv` (batch grading output)
 - `results/<Name>/`: per-participant CSVs and PNGs from analysis
-- `outputs/`
+- `output`
 	- `correlation_analysis/`: all correlation figures and CSVs
 	- `prediction_analysis/`: prediction outputs (`fusion_only_predictions.csv`)
 
@@ -92,7 +92,7 @@ python .\src\correlation\fusion_summary_correlation.py
 # Scatter plots across modalities + summary CSV
 python .\src\correlation\visualize_correlations_scatter.py
 ```
-Writes to `outputs/correlation_analysis/`:
+Writes to `outputcorrelation_analysis/`:
 - `fusion_summary_merged.csv`
 - `fusion_summary_correlations.csv`
 - `fusion_summary_correlation_heatmap.png`
